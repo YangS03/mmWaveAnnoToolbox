@@ -1,8 +1,18 @@
-import cmd
+import sys
+sys.path.append('.')
 import time
 import importlib
 import serial
 import serial.tools.list_ports as list_ports
+
+
+def search_available_ports():
+    available_ports = {}
+    ports = list_ports.comports()
+    for port, desc, hwid in sorted(ports):
+        available_ports[desc] = port
+    return available_ports        
+
 
 class mmWaveRecoder:
     def __init__(self, port, baudrate=115200, device='iwr1843'):
@@ -20,7 +30,7 @@ class mmWaveRecoder:
         self.first_frame = True
         
     def _load_config(self):
-        cfg = importlib.import_module('configs.mmwave_radar.' + self.device)
+        cfg = importlib.import_module('radar_configs.mmwave_radar.' + self.device)
         for cfg_key, cfg_value in cfg.radar.items():
             if isinstance(cfg_value, str): 
                 cfg_item = cfg_key + ' ' + cfg_value
@@ -39,6 +49,14 @@ class mmWaveRecoder:
         if self.serial is not None: 
             self.serial.write((data + '\n').encode())
         time.sleep(0.01)
+        
+    def get_port_list(self):
+        print('Available ports:')
+        ports = list_ports.comports()
+        if len(ports) == 0:
+            print('No available ports')
+        for port, desc, hwid in sorted(ports):
+            print("{}: {}".format(port, desc))
 
     def show_config(self):
         for data in self.serial_data:
@@ -51,41 +69,20 @@ class mmWaveRecoder:
     
     def send_start(self):
         if self.first_frame: 
-            self._write_serial('sensorStart')        
-            
+            self._write_serial('sensorStart')      
+        else: 
+            self._write_serial('sensorStart 0')        
         
     def send_stop(self):
         self._write_serial('sensorStop')    
-        
-        
-class CMDClient(cmd.Cmd):
-    def __init__(self):
-        super(CMDClient, self).__init__()
-        # search for available ports
-        ports = list_ports.comports()
-        print('Available ports:')
-        if len(ports) == 0:
-            print('No available ports')
-        for port, desc, hwid in sorted(ports):
-            print("{}: {}".format(port, desc))
-        # initialize the recorders
-        port = 'COM' + input('Please select a port:')        
-        self.recorder = mmWaveRecoder(port=port)
-    
-    def do_start_record(self, arg):
-        self.recorder.send_start()
-        
-    def do_stop_record(self, arg):
-        self.recorder.send_stop()
-        
-    def do_show_config(self, arg):
-        self.recorder.show_config()
-        
-    def do_quit(self, arg):
-        'Quit the application'
-        print('Exiting...')
-        return True
-    
+        self.first_frame = False  
+
+
 if __name__ == '__main__': 
-    cmd = CMDClient()
-    cmd.cmdloop()
+    recoder = mmWaveRecoder(port='COM18', device='iwr1843')
+    recoder.show_config()
+    while True: 
+        recoder.send_start()
+        time.sleep(1)
+        recoder.send_stop()
+        time.sleep(1)
