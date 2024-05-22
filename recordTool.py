@@ -1,14 +1,9 @@
 import os
 import gradio as gr
-
 from mmCollector import mmWaveRecoder, search_available_ports
 
 
-recorder_hori = None
-recorder_vert = None
-
-
-def on_connect_click(port_hori, port_vert): 
+def on_connect_click(port_hori, port_vert):
     global recorder_hori, recorder_vert, available_ports
     try: 
         if port_hori and port_hori != 'None': 
@@ -45,6 +40,8 @@ def on_stop_click():
 if __name__ == '__main__': 
     
     # variables
+    recorder_hori = None
+    recorder_vert = None
     selected_port_vert: mmWaveRecoder = None
     selected_port_hori: mmWaveRecoder = None
     available_ports = search_available_ports()

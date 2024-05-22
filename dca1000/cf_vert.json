@@ -19,7 +19,7 @@
       "DCA1000DataPort": 4098
     },
     "captureConfig": {
-      "fileBasePath": "D:\\Nutstore\\Workspace\\mmWave_workspace\\mmWave\\data_vertical",
+      "fileBasePath": ".\\saved_files\\vert",
       "filePrefix": "adc_data",
       "maxRecFileSize_MB": 1024,
       "sequenceNumberEnable": 1,

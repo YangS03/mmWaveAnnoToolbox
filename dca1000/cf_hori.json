@@ -7,19 +7,19 @@
     "dataFormatMode": 3,
     "packetDelay_us": 25,
     "ethernetConfig": {
-      "DCA1000IPAddress": "192.168.33.180",
-      "DCA1000ConfigPort": 4096,
-      "DCA1000DataPort": 4098
+      "DCA1000IPAddress": "192.168.33.181",
+      "DCA1000ConfigPort": 4086,
+      "DCA1000DataPort": 4088
     },
     "ethernetConfigUpdate": {
-      "systemIPAddress": "192.168.33.30",
-      "DCA1000IPAddress": "192.168.33.180",
-      "DCA1000MACAddress": "12.34.56.78.90.12",
-      "DCA1000ConfigPort": 4096,
-      "DCA1000DataPort": 4098
+      "systemIPAddress": "192.168.33.31",
+      "DCA1000IPAddress": "192.168.33.181",
+      "DCA1000MACAddress": "12.34.56.78.90.13",
+      "DCA1000ConfigPort": 4086,
+      "DCA1000DataPort": 4088
     },
     "captureConfig": {
-      "fileBasePath": "D:\\Nutstore\\Workspace\\mmWave_workspace\\mmWave",
+      "fileBasePath": ".\\saved_files\\hori",
       "filePrefix": "adc_data",
       "maxRecFileSize_MB": 1024,
       "sequenceNumberEnable": 1,
