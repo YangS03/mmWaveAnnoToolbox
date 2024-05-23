@@ -56,28 +56,13 @@ class Beamformer(object):
             power_spectrum = np.einsum('mii->mi', power_spectrum)
             power_spectrum *= np.einsum('ijj->i', auto_correlation_matrix, optimize='optimal')[:, np.newaxis]
             
-        elif x.ndim == 4: 
-            # [num_slow_samples, num_range_bins, num_antennas, num_samples]
-            self.num_slow_samples = x.shape[0]
-            self.num_range_bins = x.shape[1]
-            
-            auto_correlation_matrix = np.einsum('xmnl,xmlk->xmnk', x, np.conjugate(x.transpose(0, 1, 3, 2)))
-            auto_correlation_matrix_norm = np.divide(auto_correlation_matrix, \
-                np.einsum('xmii->xm', auto_correlation_matrix)[:, :, np.newaxis, np.newaxis])
-            bm_weights = self.beamforming_func(auto_correlation_matrix_norm)
-            w = bm_weights
-            w_H = np.conj(w).transpose(0, 1, 3, 2)
-            # power_spectrum: [num_slow_samples, num_range_bins, num_angle_bins]
-            power_spectrum = np.einsum('xmnl,xmlk->xmnk', np.einsum('xmnl,xmlk->xmnk', w_H, auto_correlation_matrix), w)
-            power_spectrum = np.einsum('xmii->xmi', power_spectrum)
-            power_spectrum *= np.einsum('xijj->xi', auto_correlation_matrix, optimize='optimal')[:, :, np.newaxis]
-            
         return power_spectrum, bm_weights
          
     def update_gain_mat(self, gains):
         # self.gain_mat_guess = np.diag(gains / np.max(gains))    
         self.gain_mat_guess = np.einsum('ij,jk->ijk', gains, np.eye(self.num_antennas))
         self.gain_mat_guess /= np.max(self.gain_mat_guess, axis=(1, 2))[:, np.newaxis, np.newaxis]   # [num_range_bins, num_antennas, num_antennas]
+ 
  
 class BartlettBeamformer(Beamformer):
     def beamforming_func(self, rxx):
@@ -88,8 +73,6 @@ class BartlettBeamformer(Beamformer):
         elif rxx.ndim == 3: 
             return np.tile(self.steering_vector, (self.num_range_bins, 1, 1))
         
-        elif rxx.ndim == 4: 
-            return np.tile(self.steering_vector, (self.num_slow_samples, self.num_range_bins, 1, 1))
 
 class CaponBeamformer(Beamformer):
     def beamforming_func(self, rxx):
@@ -120,19 +103,6 @@ class CaponBeamformer(Beamformer):
             weights = num_matrix / np.einsum("mii->mi", den_matrix)[: , np.newaxis, :]
             return weights
 
-        elif rxx.ndim == 4:
-            # Calculate the inverse of the auto-correlation matrix
-            rxx_inv = np.linalg.inv(rxx)    # [num_slow_samples, num_range_bins, num_antennas, num_antennas]
-            weights = np.zeros((self.num_slow_samples, self.num_range_bins, self.num_antennas, self.num_steps), dtype=np.complex128)
-            # Create a matrix of steering vectors for all angles
-            sv_aoa = np.tile(self.steering_vector, (self.num_slow_samples, self.num_range_bins, 1, 1)) # [num_slow_samples, num_range_bins, num_antennas, num_steps]
-            # Compute the numerator and denominator matrices in one go
-            num_matrix = np.einsum('xijk,xikl->xijl', rxx_inv, sv_aoa) # [num_slow_samples, num_range_bins, num_antennas, num_steps]
-            den_matrix = np.einsum('xijk,xikl->xijl', \
-                np.einsum('xijk,xikl->xijl', sv_aoa.conj().transpose(0, 1, 3, 2), rxx_inv), sv_aoa)   # [num_slow_samples, num_range_bins, num_steps, num_steps]
-            # Use broadcasting to perform element-wise division
-            weights = num_matrix / np.einsum("xmii->xmi", den_matrix)[: , :, np.newaxis, :]
-            return weights
 
 # class RobustCaponBeamformer(Beamformer):
 #     def __init__(self, num_steps, num_antennas, antenna_gain_mat=None, threshold=0.2):

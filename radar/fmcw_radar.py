@@ -9,8 +9,10 @@ from radar.beamformer import BartlettBeamformer, CaponBeamformer
 class FMCWRadar(object): 
     def __init__(self, config):
         self.config = config.mmwave
+        
+        assert self.config.num_antenna == 12, "Only support iwrxx43 radars"
         self.beamformer = CaponBeamformer(
-            self.config.num_angle_bins, self.config.num_antenna)
+            self.config.num_angle_bins, self.config.num_rx * 2)
         
         self.num_frames = self.config.num_frames
         self.num_chirps = self.config.num_chirps
@@ -20,11 +22,12 @@ class FMCWRadar(object):
         self.num_multiframes = self.config.num_slow_samples // self.config.num_chirps
         
         self.num_angle_bins = self.config.num_angle_bins
+        self.num_ele_bins = self.config.num_elevation_bins
         self.num_range_bins = self.config.num_range_bins
         self.num_doppler_bins = self.config.num_doppler_bins
         
         self.wind_func = np.hanning(self.num_fast_samples)
-        self.wind_func_angle = np.hanning(self.num_antenna)
+
         
     def read_data(self, filename):
         
@@ -71,25 +74,24 @@ class FMCWRadar(object):
             IQ_complex = IQ_complex[target_frame_idx: target_frame_idx+num_multiframe, :, :, :] # [num_multi_frames, num_chirps, num_antenna, num_fast_samples]
             IQ_samples = np.reshape(IQ_complex, (self.num_slow_samples, self.num_antenna, self.num_fast_samples))   # [num_slow_samples, num_antenna, num_fast_samples]
             IQ_samples = np.multiply(IQ_samples, self.wind_func)  
-            slow_time_samples = np.fft.fft(IQ_samples, axis=-1)
+            slow_time_samples = np.fft.fft(IQ_samples, n=self.num_range_bins, axis=-1)
             # [num_range_bins, num_antenna, num_slow_samples]
             slow_time_samples = np.transpose(slow_time_samples[:, :, :], (2, 1, 0))
         else: 
             # Using cupy to perform fft
             IQ_samples = IQ_complex
             IQ_samples = np.multiply(IQ_samples, self.wind_func)  
-            slow_time_samples = np.fft.fft(IQ_samples, axis=-1)
+            slow_time_samples = np.fft.fft(IQ_samples, n=self.num_range_bins, axis=-1)
             slow_time_samples = np.transpose(slow_time_samples[:, :, :], (2, 1, 0))
-            
+        assert slow_time_samples.shape == (self.num_range_bins, self.num_antenna, self.num_slow_samples)
         return slow_time_samples
     
     def doppler_fft(self, slow_time_samples):
         # Using cupy to perform fft
         # [num_range_bins, num_antenna, num_dopper_bins]
         slow_time_samples = slow_time_samples * np.hanning(self.num_doppler_bins)
-        doppler_samples = np.fft.fft(slow_time_samples, axis=-1)
+        doppler_samples = np.fft.fft(slow_time_samples, n=self.num_doppler_bins, axis=-1)
         doppler_samples = np.fft.fftshift(doppler_samples, axes=-1)
-        
         return doppler_samples
     
     def phase_error_compensation(self, slow_time_samples):
@@ -107,8 +109,13 @@ class FMCWRadar(object):
                 
         return slow_time_samples
     
-    
-    
+    def parse_data(self, IQ_complex): 
+        # [num_range_bins, num_antenna, num_chirps]
+        rx = self.config.num_rx
+        radar_data_8rx = np.concatenate([IQ_complex[:, 0: rx, :], IQ_complex[:, rx * 2: rx * 3, :]], axis=1)
+        radar_data_4rx = IQ_complex[:, rx: rx * 2, :]
+        return radar_data_8rx, radar_data_4rx
+        
     def get_window_sample(self, slow_time_samples, window_size, window_step=1, sample_mothod="sliding"):
         # slow_time_samples: [num_range_bins, num_antenna, num_slow_samples]
         # Get window samples
@@ -120,18 +127,24 @@ class FMCWRadar(object):
                 window_slow_time_samples[idx_wind, :, :, :] = sub_slow_time_samples    
         return window_slow_time_samples
             
-    
     def angle_fft(self, slow_time_samples):
         # Using cupy to perform fft
         # slow_time_samples: [num_range_bins, num_antenna, num_dopper_bins]
-        slow_time_samples = slow_time_samples * np.hanning(self.num_antenna)[np.newaxis, :, np.newaxis]
-        angle_samples = np.fft.fft(slow_time_samples, n=self.config.num_angle_bins, axis=1)
+        num_antenna = slow_time_samples.shape[1]
+        slow_time_samples = slow_time_samples * np.hanning(num_antenna)[np.newaxis, :, np.newaxis]
+        angle_samples = np.fft.fft(slow_time_samples, n=self.num_angle_bins, axis=1)
         angle_samples = np.fft.fftshift(angle_samples, axes=1)
-        
+        return angle_samples
+    
+    def elevation_fft(self, slow_time_samples):
+        # Using cupy to perform fft
+        # slow_time_samples: [num_range_bins, num_angle_bins, num_elevate, num_dopper_bins]
+        num_elevate = slow_time_samples.shape[2]
+        angle_samples = np.fft.fft(slow_time_samples, n=self.num_ele_bins, axis=2)
+        angle_samples = np.fft.fftshift(angle_samples, axes=2)
         return angle_samples
     
     def remove_direct_component(self, range_ffts):
-        
         num_slow_time_samples = range_ffts.shape[-1]
         shape_len = len(range_ffts.shape)
 
@@ -177,21 +190,8 @@ class FMCWRadar(object):
         slow_time_signal = np.einsum('ijk,ikl->ijl', beamforming_weights_H, slow_time_samples)  # [num_range_bins, num_angle_bins, num_slow_samples]
         
         return slow_time_signal 
-    
-    def get_RAD_data(self, IQ_complex): 
-        # Get range data
-        slow_time_samples = self.range_fft(IQ_complex)
-        slow_time_samples = self.remove_direct_component(slow_time_samples)
-        # Get doppler data
-        doppler_samples = self.doppler_fft(slow_time_samples)
-        # Get angle data
-        range_angle_spectrum = self.angle_fft(slow_time_samples)
-        
-        return range_angle_spectrum
 
-    def get_spec_data(self, IQ_complex, type='beamforming'): 
-        # Get range data
-        slow_time_samples = self.range_fft(IQ_complex)
+    def get_spectrum_data(self, slow_time_samples, type='beamforming'): 
         slow_time_samples = self.remove_direct_component(slow_time_samples)
         
         if type == 'beamforming':
@@ -207,12 +207,58 @@ class FMCWRadar(object):
             range_angle_spectrum = range_angle_spectrum.sum(axis=-1)
         return range_angle_spectrum
 
+    def get_RAED_data(self, radar_data_8rx, radar_data_4rx): 
+        # Get range data
+        radar_data_8rx = self.remove_direct_component(radar_data_8rx)
+        radar_data_4rx = self.remove_direct_component(radar_data_4rx)
+        # Get doppler data
+        radar_data_8rx = self.doppler_fft(radar_data_8rx)
+        radar_data_4rx = self.doppler_fft(radar_data_4rx)
+        # Get angle data
+        radar_data_8rx = self.angle_fft(radar_data_8rx)
+        radar_data_4rx = self.angle_fft(radar_data_4rx)
+        radar_data = np.stack([radar_data_8rx, radar_data_4rx], axis=2)
+        radar_data = self.elevation_fft(radar_data)
+        radar_data = np.abs(radar_data)
+        return radar_data
+
 
 if __name__ == "__main__":
 
+    import matplotlib.pyplot as plt
     import radar_configs.mmwave_radar.iwr1843 as cfg
-    
+    # read data
     radar = FMCWRadar(cfg)
     I, Q = radar.read_data('dca1000/saved_files/vert/adc_data_Raw_0.bin')
-    data = I + 1j * Q
-    print(data.shape)
+    radar_complex = I + 1j * Q
+    # perform range fft
+    radar_complex = radar.range_fft(radar_complex, target_frame_idx=30)
+    # parse channels
+    radar_data_8rx, radar_data_4rx = radar.parse_data(radar_complex)
+    # perfrom beamforming
+    radar_spec = radar.get_spectrum_data(radar_data_8rx, type='beamforming')
+
+    radar_4d_heatmap = radar.get_RAED_data(radar_data_8rx, radar_data_4rx)  # [range, angle, elevation, doppler]
+    ra_view = np.sum(radar_4d_heatmap, axis=(2, 3))
+    re_view = np.sum(radar_4d_heatmap, axis=(1, 3))
+    ae_view = np.sum(radar_4d_heatmap, axis=(0, 3))
+    
+    plt.subplot(221)
+    plt.imshow(radar_spec, origin='lower')
+    plt.title('RA-spectrum')
+    
+    plt.subplot(222)
+    plt.imshow(ra_view, origin='lower')
+    plt.title('RA-view')
+    
+    plt.subplot(223)
+    plt.imshow(re_view, origin='lower')
+    plt.title('RE-view')
+    
+    plt.subplot(224)
+    plt.imshow(ae_view, origin='lower')
+    plt.title('AE-view')
+    
+    plt.show()
+
+    
