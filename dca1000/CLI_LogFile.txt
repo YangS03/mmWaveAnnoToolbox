@@ -4144,3 +4144,983 @@ Record is completed
 
 Wed May 22 20:34:35 2024
 Record stop is done successfully
+
+Thu May 23 12:25:59 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:25:59 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:25:59 2024
+Return status : 0
+
+Thu May 23 12:26:04 2024
+Start Record Command (req)
+
+Thu May 23 12:26:04 2024
+Start Record command : Success
+
+Thu May 23 12:26:04 2024
+Return status : 0
+
+Thu May 23 12:26:16 2024
+Record is completed
+
+Thu May 23 12:26:16 2024
+Record stop is done successfully
+
+Thu May 23 12:27:05 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:27:05 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:27:05 2024
+Return status : 0
+
+Thu May 23 12:27:07 2024
+Start Record Command (req)
+
+Thu May 23 12:27:07 2024
+Start Record command : Success
+
+Thu May 23 12:27:07 2024
+Return status : 0
+
+Thu May 23 12:27:15 2024
+Record is completed
+
+Thu May 23 12:27:16 2024
+Record stop is done successfully
+
+Thu May 23 12:28:34 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:28:34 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:28:34 2024
+Return status : 0
+
+Thu May 23 12:28:35 2024
+Start Record Command (req)
+
+Thu May 23 12:28:35 2024
+Start Record command : Success
+
+Thu May 23 12:28:35 2024
+Return status : 0
+
+Thu May 23 12:28:44 2024
+Record is completed
+
+Thu May 23 12:28:44 2024
+Record stop is done successfully
+
+Thu May 23 12:36:12 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:36:12 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:36:12 2024
+Return status : 0
+
+Thu May 23 12:36:18 2024
+Start Record Command (req)
+
+Thu May 23 12:36:18 2024
+Start Record command : Success
+
+Thu May 23 12:36:18 2024
+Return status : 0
+
+Thu May 23 12:36:26 2024
+Record is completed
+
+Thu May 23 12:36:27 2024
+Record stop is done successfully
+
+Thu May 23 12:36:44 2024
+Start Record Command (req)
+
+Thu May 23 12:36:44 2024
+Start Record command : Success
+
+Thu May 23 12:36:44 2024
+Return status : 0
+
+Thu May 23 12:36:59 2024
+Record is completed
+
+Thu May 23 12:36:59 2024
+Record stop is done successfully
+
+Thu May 23 12:37:22 2024
+Start Record Command (req)
+
+Thu May 23 12:37:22 2024
+Start Record command : Success
+
+Thu May 23 12:37:22 2024
+Return status : 0
+
+Thu May 23 12:37:30 2024
+Record is completed
+
+Thu May 23 12:37:30 2024
+Record stop is done successfully
+
+Thu May 23 12:38:01 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:38:01 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:38:01 2024
+Return status : 0
+
+Thu May 23 12:38:05 2024
+Start Record Command (req)
+
+Thu May 23 12:38:05 2024
+Start Record command : Success
+
+Thu May 23 12:38:05 2024
+Return status : 0
+
+Thu May 23 12:38:16 2024
+Record is completed
+
+Thu May 23 12:38:16 2024
+Record stop is done successfully
+
+Thu May 23 12:38:30 2024
+Start Record Command (req)
+
+Thu May 23 12:38:30 2024
+Start Record command : Success
+
+Thu May 23 12:38:30 2024
+Return status : 0
+
+Thu May 23 12:38:45 2024
+Record is completed
+
+Thu May 23 12:38:45 2024
+Record stop is done successfully
+
+Thu May 23 12:44:11 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:44:11 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:44:11 2024
+Return status : 0
+
+Thu May 23 12:44:12 2024
+Start Record Command (req)
+
+Thu May 23 12:44:12 2024
+Start Record command : Success
+
+Thu May 23 12:44:12 2024
+Return status : 0
+
+Thu May 23 12:44:21 2024
+Record is completed
+
+Thu May 23 12:44:21 2024
+Record stop is done successfully
+
+Thu May 23 12:44:31 2024
+Start Record Command (req)
+
+Thu May 23 12:44:31 2024
+Start Record command : Success
+
+Thu May 23 12:44:31 2024
+Return status : 0
+
+Thu May 23 12:45:01 2024
+No LVDS data
+
+Thu May 23 12:45:01 2024
+Record stop is done successfully
+
+Thu May 23 12:46:04 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:46:04 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:46:04 2024
+Return status : 0
+
+Thu May 23 12:46:04 2024
+Start Record Command (req)
+
+Thu May 23 12:46:04 2024
+Start Record command : Success
+
+Thu May 23 12:46:04 2024
+Return status : 0
+
+Thu May 23 12:46:13 2024
+Record is completed
+
+Thu May 23 12:46:13 2024
+Record stop is done successfully
+
+Thu May 23 12:47:16 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:47:16 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:47:16 2024
+Return status : 0
+
+Thu May 23 12:47:17 2024
+Start Record Command (req)
+
+Thu May 23 12:47:17 2024
+Start Record command : Success
+
+Thu May 23 12:47:17 2024
+Return status : 0
+
+Thu May 23 12:47:26 2024
+Record is completed
+
+Thu May 23 12:47:26 2024
+Record stop is done successfully
+
+Thu May 23 12:47:39 2024
+Start Record Command (req)
+
+Thu May 23 12:47:39 2024
+Start Record command : Success
+
+Thu May 23 12:47:39 2024
+Return status : 0
+
+Thu May 23 12:47:50 2024
+Record is completed
+
+Thu May 23 12:47:50 2024
+Record stop is done successfully
+
+Thu May 23 12:48:16 2024
+Start Record Command (req)
+
+Thu May 23 12:48:16 2024
+Start Record command : Success
+
+Thu May 23 12:48:16 2024
+Return status : 0
+
+Thu May 23 12:48:30 2024
+Record is completed
+
+Thu May 23 12:48:30 2024
+Record stop is done successfully
+
+Thu May 23 12:49:54 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:49:54 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:49:54 2024
+Return status : 0
+
+Thu May 23 12:49:56 2024
+Start Record Command (req)
+
+Thu May 23 12:49:56 2024
+Start Record command : Success
+
+Thu May 23 12:49:56 2024
+Return status : 0
+
+Thu May 23 12:50:06 2024
+Record is completed
+
+Thu May 23 12:50:06 2024
+Record stop is done successfully
+
+Thu May 23 12:50:15 2024
+Start Record Command (req)
+
+Thu May 23 12:50:15 2024
+Start Record command : Success
+
+Thu May 23 12:50:15 2024
+Return status : 0
+
+Thu May 23 12:50:24 2024
+Record is completed
+
+Thu May 23 12:50:25 2024
+Record stop is done successfully
+
+Thu May 23 12:51:26 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:51:26 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:51:26 2024
+Return status : 0
+
+Thu May 23 12:51:28 2024
+Start Record Command (req)
+
+Thu May 23 12:51:28 2024
+Start Record command : Success
+
+Thu May 23 12:51:28 2024
+Return status : 0
+
+Thu May 23 12:51:58 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:51:58 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:51:58 2024
+Return status : 0
+
+Thu May 23 12:51:58 2024
+Start Record Command (req)
+
+Thu May 23 12:51:58 2024
+Start Record command : Success
+
+Thu May 23 12:51:58 2024
+Return status : 0
+
+Thu May 23 12:52:04 2024
+Record is completed
+
+Thu May 23 12:52:04 2024
+Record stop is done successfully
+
+Thu May 23 12:52:16 2024
+Start Record Command (req)
+
+Thu May 23 12:52:16 2024
+Start Record command : Success
+
+Thu May 23 12:52:16 2024
+Return status : 0
+
+Thu May 23 12:52:23 2024
+Record is completed
+
+Thu May 23 12:52:23 2024
+Record stop is done successfully
+
+Thu May 23 12:53:15 2024
+Start Record Command (req)
+
+Thu May 23 12:53:15 2024
+Start Record command : Success
+
+Thu May 23 12:53:15 2024
+Return status : 0
+
+Thu May 23 12:53:22 2024
+Record is completed
+
+Thu May 23 12:53:22 2024
+Record stop is done successfully
+
+Thu May 23 12:53:33 2024
+Start Record Command (req)
+
+Thu May 23 12:53:33 2024
+Start Record command : Success
+
+Thu May 23 12:53:33 2024
+Return status : 0
+
+Thu May 23 12:53:40 2024
+Record is completed
+
+Thu May 23 12:53:40 2024
+Record stop is done successfully
+
+Thu May 23 12:53:51 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:53:51 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:53:51 2024
+Return status : 0
+
+Thu May 23 12:53:53 2024
+Start Record Command (req)
+
+Thu May 23 12:53:53 2024
+Start Record command : Success
+
+Thu May 23 12:53:53 2024
+Return status : 0
+
+Thu May 23 12:54:00 2024
+Record is completed
+
+Thu May 23 12:54:00 2024
+Record stop is done successfully
+
+Thu May 23 12:57:27 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:57:27 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:57:27 2024
+Return status : 0
+
+Thu May 23 12:57:31 2024
+Start Record Command (req)
+
+Thu May 23 12:57:31 2024
+Start Record command : Success
+
+Thu May 23 12:57:31 2024
+Return status : 0
+
+Thu May 23 12:57:41 2024
+Record is completed
+
+Thu May 23 12:57:41 2024
+Record stop is done successfully
+
+Thu May 23 12:57:51 2024
+Start Record Command (req)
+
+Thu May 23 12:57:51 2024
+Start Record command : Success
+
+Thu May 23 12:57:51 2024
+Return status : 0
+
+Thu May 23 12:58:49 2024
+FPGA Configuration Command (req)
+
+Thu May 23 12:58:49 2024
+FPGA Configuration command : Success
+
+Thu May 23 12:58:49 2024
+Return status : 0
+
+Thu May 23 12:58:52 2024
+Start Record Command (req)
+
+Thu May 23 12:58:52 2024
+Start Record command : Success
+
+Thu May 23 12:58:52 2024
+Return status : 0
+
+Thu May 23 12:59:02 2024
+Record is completed
+
+Thu May 23 12:59:02 2024
+Record stop is done successfully
+
+Thu May 23 12:59:18 2024
+Start Record Command (req)
+
+Thu May 23 12:59:18 2024
+Start Record command : Success
+
+Thu May 23 12:59:18 2024
+Return status : 0
+
+Thu May 23 12:59:38 2024
+Record is completed
+
+Thu May 23 12:59:38 2024
+Record stop is done successfully
+
+Thu May 23 13:00:58 2024
+FPGA Configuration Command (req)
+
+Thu May 23 13:00:58 2024
+FPGA Configuration command : Success
+
+Thu May 23 13:00:58 2024
+Return status : 0
+
+Thu May 23 13:00:59 2024
+Start Record Command (req)
+
+Thu May 23 13:00:59 2024
+Start Record command : Success
+
+Thu May 23 13:00:59 2024
+Return status : 0
+
+Thu May 23 13:06:51 2024
+Record is completed
+
+Thu May 23 13:06:51 2024
+Record stop is done successfully
+
+Thu May 23 13:08:13 2024
+Start Record Command (req)
+
+Thu May 23 13:08:13 2024
+Start Record command : Success
+
+Thu May 23 13:08:13 2024
+Return status : 0
+
+Thu May 23 13:09:38 2024
+Record Process : 
+Timeout Error! System disconnected
+
+Thu May 23 13:09:48 2024
+Record stop failed
+
+Thu May 23 13:10:55 2024
+Start Record Command (req)
+
+Thu May 23 13:10:55 2024
+Start Record command : Success
+
+Thu May 23 13:10:55 2024
+Return status : 0
+
+Thu May 23 13:11:11 2024
+fpga
+
+Thu May 23 13:11:11 2024
+Stop the already running process.
+
+Thu May 23 13:12:24 2024
+Record is completed
+
+Thu May 23 13:12:25 2024
+Record stop is done successfully
+
+Thu May 23 13:38:25 2024
+FPGA Configuration Command (req)
+
+Thu May 23 13:38:25 2024
+FPGA Configuration command : Success
+
+Thu May 23 13:38:25 2024
+Return status : 0
+
+Thu May 23 13:38:28 2024
+Start Record Command (req)
+
+Thu May 23 13:38:28 2024
+Start Record command : Success
+
+Thu May 23 13:38:28 2024
+Return status : 0
+
+Thu May 23 13:40:14 2024
+Record Process : 
+Timeout Error! System disconnected
+
+Thu May 23 13:40:24 2024
+Record stop failed
+
+Thu May 23 13:41:21 2024
+Start Record Command (req)
+
+Thu May 23 13:41:21 2024
+Start Record command : Success
+
+Thu May 23 13:41:21 2024
+Return status : 0
+
+Thu May 23 13:42:50 2024
+Record Process : 
+Timeout Error! System disconnected
+
+Thu May 23 13:43:00 2024
+Record stop failed
+
+Thu May 23 13:47:59 2024
+FPGA Configuration Command (req)
+
+Thu May 23 13:47:59 2024
+FPGA Configuration command : Success
+
+Thu May 23 13:47:59 2024
+Return status : 0
+
+Thu May 23 13:48:00 2024
+Start Record Command (req)
+
+Thu May 23 13:48:00 2024
+Start Record command : Success
+
+Thu May 23 13:48:00 2024
+Return status : 0
+
+Thu May 23 13:48:10 2024
+Record is completed
+
+Thu May 23 13:48:21 2024
+Record stop failed
+
+Thu May 23 13:49:15 2024
+FPGA Configuration Command (req)
+
+Thu May 23 13:49:15 2024
+FPGA Configuration command : Success
+
+Thu May 23 13:49:15 2024
+Return status : 0
+
+Thu May 23 13:49:16 2024
+Start Record Command (req)
+
+Thu May 23 13:49:16 2024
+Start Record command : Success
+
+Thu May 23 13:49:16 2024
+Return status : 0
+
+Thu May 23 13:50:21 2024
+Record is completed
+
+Thu May 23 13:50:21 2024
+Record stop is done successfully
+
+Thu May 23 14:15:22 2024
+FPGA Configuration Command (req)
+
+Thu May 23 14:15:22 2024
+FPGA Configuration command : Success
+
+Thu May 23 14:15:22 2024
+Return status : 0
+
+Thu May 23 14:15:22 2024
+FPGA Configuration Command (req)
+
+Thu May 23 14:15:32 2024
+FPGA Configuration : 
+Timeout Error! System disconnected
+
+Thu May 23 14:15:32 2024
+Return status : -5
+
+Thu May 23 14:15:34 2024
+FPGA Configuration Command (req)
+
+Thu May 23 14:15:34 2024
+FPGA Configuration command : Success
+
+Thu May 23 14:15:34 2024
+Return status : 0
+
+Thu May 23 14:15:34 2024
+FPGA Configuration Command (req)
+
+Thu May 23 14:15:34 2024
+FPGA Configuration command : Success
+
+Thu May 23 14:15:34 2024
+Return status : 0
+
+Thu May 23 14:15:39 2024
+Start Record Command (req)
+
+Thu May 23 14:15:39 2024
+Start Record command : Success
+
+Thu May 23 14:15:39 2024
+Return status : 0
+
+Thu May 23 14:15:40 2024
+Start Record Command (req)
+
+Thu May 23 14:15:40 2024
+Start Record command : Success
+
+Thu May 23 14:15:40 2024
+Return status : 0
+
+Thu May 23 14:17:44 2024
+Record Process : 
+Timeout Error! System disconnected
+
+Thu May 23 14:17:45 2024
+Record Process : 
+Timeout Error! System disconnected
+
+Thu May 23 14:17:54 2024
+Record stop failed
+
+Thu May 23 14:17:55 2024
+Record stop failed
+
+Thu May 23 16:15:39 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:15:49 2024
+FPGA Configuration : 
+Timeout Error! System disconnected
+
+Thu May 23 16:15:49 2024
+Return status : -5
+
+Thu May 23 16:15:49 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:15:49 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:15:49 2024
+Return status : 0
+
+Thu May 23 16:15:51 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:16:01 2024
+FPGA Configuration : 
+Timeout Error! System disconnected
+
+Thu May 23 16:16:01 2024
+Return status : -5
+
+Thu May 23 16:16:02 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:16:02 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:16:02 2024
+Return status : 0
+
+Thu May 23 16:16:04 2024
+Start Record Command (req)
+
+Thu May 23 16:16:06 2024
+fpga
+
+Thu May 23 16:16:06 2024
+Stop the already running process.
+
+Thu May 23 16:16:06 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:16:06 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:16:06 2024
+Return status : 0
+
+Thu May 23 16:16:07 2024
+fpga
+
+Thu May 23 16:16:07 2024
+Stop the already running process.
+
+Thu May 23 16:16:07 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:16:07 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:16:07 2024
+Return status : 0
+
+Thu May 23 16:16:11 2024
+fpga
+
+Thu May 23 16:16:11 2024
+Stop the already running process.
+
+Thu May 23 16:16:11 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:16:11 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:16:11 2024
+Return status : 0
+
+Thu May 23 16:16:14 2024
+Start Record : 
+Timeout Error! System disconnected
+
+Thu May 23 16:16:14 2024
+Return status : -5
+
+Thu May 23 16:17:16 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:17:26 2024
+FPGA Configuration : 
+Timeout Error! System disconnected
+
+Thu May 23 16:17:26 2024
+Return status : -5
+
+Thu May 23 16:17:26 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:17:26 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:17:26 2024
+Return status : 0
+
+Thu May 23 16:17:43 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:17:53 2024
+FPGA Configuration : 
+Timeout Error! System disconnected
+
+Thu May 23 16:17:53 2024
+Return status : -5
+
+Thu May 23 16:17:53 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:17:53 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:17:53 2024
+Return status : 0
+
+Thu May 23 16:18:25 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:18:35 2024
+FPGA Configuration : 
+Timeout Error! System disconnected
+
+Thu May 23 16:18:35 2024
+Return status : -5
+
+Thu May 23 16:18:35 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:18:41 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:18:45 2024
+FPGA Configuration : 
+Timeout Error! System disconnected
+
+Thu May 23 16:18:45 2024
+Return status : -5
+
+Thu May 23 16:18:47 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:18:52 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:19:00 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:19:00 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:19:00 2024
+Return status : 0
+
+Thu May 23 16:19:02 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:20:27 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:20:27 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:20:27 2024
+Return status : 0
+
+Thu May 23 16:20:28 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:20:38 2024
+FPGA Configuration : 
+Timeout Error! System disconnected
+
+Thu May 23 16:20:38 2024
+Return status : -5
+
+Thu May 23 16:22:12 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:22:12 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:22:12 2024
+Return status : 0
+
+Thu May 23 16:22:13 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:22:13 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:22:13 2024
+Return status : 0
+
+Thu May 23 16:22:39 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:22:39 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:22:39 2024
+Return status : 0
+
+Thu May 23 16:22:39 2024
+FPGA Configuration Command (req)
+
+Thu May 23 16:22:39 2024
+FPGA Configuration command : Success
+
+Thu May 23 16:22:39 2024
+Return status : 0
+
+Thu May 23 16:22:41 2024
+Start Record Command (req)
+
+Thu May 23 16:22:41 2024
+Start Record command : Success
+
+Thu May 23 16:22:41 2024
+Return status : 0
+
+Thu May 23 16:22:41 2024
+Start Record Command (req)
+
+Thu May 23 16:22:41 2024
+Start Record command : Success
+
+Thu May 23 16:22:41 2024
+Return status : 0
+
+Thu May 23 16:22:50 2024
+Record is completed
+
+Thu May 23 16:22:50 2024
+Record is completed
+
+Thu May 23 16:22:50 2024
+Record stop is done successfully
+
+Thu May 23 16:22:50 2024
+Record stop is done successfully

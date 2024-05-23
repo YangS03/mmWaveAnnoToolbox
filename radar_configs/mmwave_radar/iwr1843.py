@@ -25,8 +25,8 @@ mmwave.file_size = mmwave.num_chirps * \
     mmwave.num_frames * mmwave.num_fast_samples * \
         mmwave.num_rx * mmwave.num_tx * mmwave.num_lanes 
 
-mmwave.num_range_bins = 256
-mmwave.num_angle_bins = 256
+mmwave.num_range_bins = 64
+mmwave.num_angle_bins = 64
 mmwave.num_elevation_bins = 8
 mmwave.num_doppler_bins = 64
 
@@ -48,8 +48,7 @@ radar = {
     'adcbufCfg': '-1 0 1 1 1', 
     'profileCfg': '0 77 267 7 57.14 0 0 70 1 256 5209 0 0 30', 
     'chirpCfg': ['0 0 0 0 0 0 0 1', '1 1 0 0 0 0 0 4', '2 2 0 0 0 0 0 2'], 
-    'frameCfg': '0 2 64 0 100.0 1 0', 
-    # 'frameCfg': '0 2 64 50 100.0 1 0', 
+    'frameCfg': '0 2 64 50 100.0 1 0', 
     'lowPower': '0 1', 
     'guiMonitor': '-1 1 1 0 0 0 1', 
     'cfarCfg': ['-1 0 2 8 4 3 0 15 1', '-1 1 0 4 2 3 1 15 1'], 

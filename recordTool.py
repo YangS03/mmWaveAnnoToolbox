@@ -18,6 +18,13 @@ def on_connect_click(port_hori, port_vert):
     except: 
         return 'Connect failed'
 
+def on_set_click(num_frames): 
+    global recorders, sending_status
+    for rec in recorders.values():
+        if rec is not None: 
+            rec.send_config(num_frames)
+    sending_status = False
+
 def on_start_click(): 
     global recorders, sending_status
     if not sending_status: 
@@ -33,7 +40,7 @@ def on_stop_click():
             if rec is not None: 
                 rec.send_stop()
     sending_status = False
-        
+    
 def on_configure_fpga(): 
     global recorders
     out = ''
@@ -81,8 +88,11 @@ if __name__ == '__main__':
         with gr.Row(): 
             btn_to_listen_hori = gr.Button('Begin FPGA listening - Horizontal')
             btn_to_listen_vert = gr.Button('Begin FPGA listening - Vertical')
-                
+        
+        slider_to_set = gr.Slider(minimum=0, maximum=600, value=50, label='Set the num frames to record')
+              
         with gr.Row(): 
+            btn_to_set = gr.Button('Send config')
             btn_to_start = gr.Button('Start record')
             btn_to_stop = gr.Button('Stop record')
             
@@ -92,6 +102,7 @@ if __name__ == '__main__':
             
         # callback bind
         btn_to_connect.click(fn=on_connect_click, inputs=[dropdown_hori, dropdown_vert], outputs=out_of_connect)
+        btn_to_set.click(fn=on_set_click, inputs=slider_to_set)
         btn_to_start.click(fn=on_start_click, inputs=None)
         btn_to_stop.click(fn=on_stop_click, inputs=None)
         # FPGA configuration 

@@ -1,6 +1,6 @@
 import time
-# import cupy as np
-import numpy as np
+import cupy as np
+# import numpy as np
 from scipy.optimize import newton_krylov
 from copy import deepcopy
 

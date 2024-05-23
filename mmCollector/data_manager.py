@@ -26,8 +26,8 @@ def parse_date_info(date_info):
 
 def read_data(id=None):
     assert id in ['vert', 'hori'], 'Invalid id'
-    adc_file_path = r'D:\Nutstore\Workspace\mmWaveAnnoToolbox\dca1000\saved_files\{}\adc_data_Raw_0.bin'.format(id)
-    log_file_path = r'D:\Nutstore\Workspace\mmWaveAnnoToolbox\dca1000\saved_files\{}\adc_data_Raw_LogFile.csv'.format(id)
+    adc_file_path = r'D:\Nutstore\Workspace\mmWave_dataset\mmWaveAnnoToolbox\dca1000\saved_files\{}\adc_data_Raw_0.bin'.format(id)
+    log_file_path = r'D:\Nutstore\Workspace\mmWave_dataset\mmWaveAnnoToolbox\dca1000\saved_files\{}\adc_data_Raw_LogFile.csv'.format(id)
     file_stat = os.stat(adc_file_path)
     with open(adc_file_path, 'rb') as f:
         adc_data = np.fromfile(f, dtype=np.int16)

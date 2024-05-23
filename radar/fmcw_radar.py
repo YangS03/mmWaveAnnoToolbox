@@ -1,7 +1,7 @@
 import sys
 sys.path.append('.')
-# import cupy as np
-import numpy as np
+import cupy as np
+# import numpy as np
 from copy import deepcopy
 from numpy.fft import fft, fftshift
 from radar.beamformer import BartlettBeamformer, CaponBeamformer
@@ -239,6 +239,7 @@ if __name__ == "__main__":
     radar_spec = radar.get_spectrum_data(radar_data_8rx, type='beamforming')
 
     radar_4d_heatmap = radar.get_RAED_data(radar_data_8rx, radar_data_4rx)  # [range, angle, elevation, doppler]
+    
     ra_view = np.sum(radar_4d_heatmap, axis=(2, 3))
     re_view = np.sum(radar_4d_heatmap, axis=(1, 3))
     ae_view = np.sum(radar_4d_heatmap, axis=(0, 3))
