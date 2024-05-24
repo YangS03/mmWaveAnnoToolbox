@@ -26,7 +26,7 @@ class FMCWRadar(object):
         self.num_range_bins = self.config.num_range_bins
         self.num_doppler_bins = self.config.num_doppler_bins
         
-        self.wind_func = np.hanning
+        self.wind_func = np.hamming
 
         
     def read_data(self, filename, complex=False):
@@ -70,6 +70,10 @@ class FMCWRadar(object):
             return adc_data_I_, adc_data_Q_
         else: 
             return adc_data_I_ + 1j * adc_data_Q_
+    
+    def read_stream(self, data_stream, complex=True):
+        data_frame = np.reshape(data_stream, (self.num_chirps, self.num_antenna, self.num_fast_samples))
+        return data_frame
         
     def range_fft(self, IQ_complex, target_frame_idx=None, num_multiframe=1):
         if target_frame_idx is not None:
@@ -114,8 +118,8 @@ class FMCWRadar(object):
     def parse_data(self, IQ_complex): 
         # [num_range_bins, num_antenna, num_chirps]
         rx = self.config.num_rx
-        radar_data_8rx = np.concatenate([IQ_complex[:, 0: rx, :], IQ_complex[:, rx * 2: rx * 3, :]], axis=1)
-        radar_data_4rx = IQ_complex[:, rx: rx * 2, :]
+        radar_data_8rx = IQ_complex[:, :rx * 2, :]
+        radar_data_4rx = IQ_complex[:, rx * 2:, :]
         return radar_data_8rx, radar_data_4rx
         
     def get_window_sample(self, slow_time_samples, window_size, window_step=1, sample_mothod="sliding"):
@@ -193,15 +197,15 @@ class FMCWRadar(object):
         
         return slow_time_signal 
 
-    def get_spectrum_data(self, slow_time_samples, type='beamforming'): 
+    def get_spectrum_data(self, slow_time_samples, method='beamform'): 
         slow_time_samples = self.remove_direct_component(slow_time_samples)
         
-        if type == 'beamforming':
+        if method == 'beamform':
             # Get angle data
             range_angle_spectrum, _ = self.perform_beamforming(slow_time_samples, update_gain_mat=False)
             range_angle_spectrum = np.abs(range_angle_spectrum)
             return range_angle_spectrum
-        elif type == 'fft':
+        elif method == 'fft':
             # Get doppler data
             doppler_samples = self.doppler_fft(slow_time_samples)
             range_angle_spectrum = self.angle_fft(doppler_samples)

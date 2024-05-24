@@ -22,11 +22,15 @@ def preprocess_data(radar, data_frame, top_size):
     doppler_result_db = np.log10(np.abs(doppler_result_db))
     # filter out the bins which are too close or too far from radar
     doppler_result_db[:8, :] = 0
-    doppler_result_db[-8:, :] = 0
+    doppler_result_db[-144:, :] = 0
     # filter out the bins lower than energy threshold
     filter_result = np.zeros_like(doppler_result_db)    # [num_range_bins, num_doppler_bins]
     energy_thre = np.sort(doppler_result_db.ravel())[-top_size - 1]
     filter_result[doppler_result_db > energy_thre] = True  
+    
+    plt.clf()
+    plt.imshow(filter_result.get())
+    
     # get range-doppler indices
     det_peaks_indices = np.argwhere(filter_result == True)
     range_scale = det_peaks_indices[:, 0].astype(np.float64) * cfg.mmwave.range_resolution
@@ -107,14 +111,22 @@ def naive_xyz(azimuth_ant, elevation_ant):
 
 if __name__ == '__main__': 
     
-    vis = o3d.visualization.Visualizer()
-    pcd = o3d.geometry.PointCloud()
-    vis.create_window()
-    vis.add_geometry(pcd)
-    vis.add_geometry(o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.5))
+    use_viz = True
+    use_plt = False
+    
+    if use_plt: 
+        plt.ion()
+    
+    if use_viz: 
+        vis = o3d.visualization.Visualizer()
+        pcd = o3d.geometry.PointCloud()
+        vis.create_window()
+        vis.add_geometry(pcd)
+        vis.add_geometry(o3d.geometry.TriangleMesh.create_coordinate_frame(size=5.0))
 
     radar = FMCWRadar(cfg)
-    bin_filename = 'dca1000/saved_files/hori/adc_data_Raw_0.bin'
+    bin_filename = r"E:\CollectedData\wxg_test\2024-05-24-17-18-12\adc_data_vert.bin"
+    # bin_filename = r"E:\CollectedData\wxg_test\2024-05-24-17-18-12\adc_data_hori.bin"
     bin_data = radar.read_data(bin_filename, complex=True)
     # for idx_frame in range(cfg.mmwave.num_frames):
     idx_global = 0
@@ -125,12 +137,16 @@ if __name__ == '__main__':
         data_frame = bin_data[idx_frame]    # [num_chirps, num_attennas, num_adc_samples]
         pointcloud = get_pointcloud(radar, data_frame, top_size=64, method='beamform').T
         pointcloud = pointcloud.get()
-        pcd.points = o3d.utility.Vector3dVector(pointcloud[:, :3])
-        color_map = repeat(pointcloud[:, 4], 'n -> n 3')
-        color_map = 1 - color_map / color_map.max()
-        pcd.colors = o3d.utility.Vector3dVector(color_map)
         # update point cloud dynamically
-        vis.update_geometry(pcd)
-        vis.poll_events()
-        vis.update_renderer()
-        time.sleep(0.1)
+        if use_viz: 
+            pcd.points = o3d.utility.Vector3dVector(pointcloud[:, :3])
+            color_map = repeat(pointcloud[:, 4], 'n -> n 3')
+            color_map = 1 - color_map / color_map.max()
+            pcd.colors = o3d.utility.Vector3dVector(color_map)
+            vis.update_geometry(pcd)
+            vis.poll_events()
+            vis.update_renderer()
+            time.sleep(0.1)
+            
+        if use_plt: 
+            plt.pause(0.01)

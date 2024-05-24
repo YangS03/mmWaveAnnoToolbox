@@ -12,7 +12,7 @@ mmwave = edict({
     "num_tx": 3,
     "num_rx": 4,
     "num_chirps": 64, # change if using FDM          
-    "num_frames": 50,
+    "num_frames": 100,
     "num_fast_samples": 256,
     "num_slow_samples": 64, # change if using FDM
     "fs": 640, # change if using FDM
@@ -26,7 +26,7 @@ mmwave.file_size = mmwave.num_chirps * \
         mmwave.num_rx * mmwave.num_tx * mmwave.num_lanes 
 
 mmwave.num_range_bins = 256
-mmwave.num_angle_bins = 64
+mmwave.num_angle_bins = 256
 mmwave.num_elevation_bins = 64
 mmwave.num_doppler_bins = 64
 
@@ -70,3 +70,4 @@ radar = {
 if __name__ == '__main__': 
     print('File size:', mmwave.file_size / 1024, 'KB')
     print('Range resolution:', mmwave.range_resolution, 'm')
+    print('Doppler resolution:', mmwave.doppler_resolution, 'm/s')

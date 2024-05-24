@@ -2,6 +2,7 @@
 import os
 os.chdir('.')
 import sys
+import shutil
 sys.path.append('.')
 import numpy as np
 from radar_configs.mmwave_radar import iwr1843
@@ -24,7 +25,7 @@ def parse_date_info(date_info):
     return date_seq
 
 
-def read_data(id=None):
+def read_data(id=None, save_path=None):
     assert id in ['vert', 'hori'], 'Invalid id'
     adc_file_path = r'D:\Nutstore\Workspace\mmWave_dataset\mmWaveAnnoToolbox\dca1000\saved_files\{}\adc_data_Raw_0.bin'.format(id)
     log_file_path = r'D:\Nutstore\Workspace\mmWave_dataset\mmWaveAnnoToolbox\dca1000\saved_files\{}\adc_data_Raw_LogFile.csv'.format(id)
@@ -37,10 +38,15 @@ def read_data(id=None):
         capture_start_info = log_data[-3].split(' ')[-4:]
         capture_end_info = log_data[-2].split(' ')[-4:]
         duration = log_data[-1].split(' ')[-1].rstrip('\n')
-        
     
     start_time_info = parse_date_info(capture_start_info)
     end_time_info = parse_date_info(capture_end_info) 
+    
+    if save_path is not None: 
+        save_path = os.path.join(r'E:\CollectedData', save_path, start_time_info)
+        os.makedirs(save_path, exist_ok=True)
+        # rename and move file to save path
+        shutil.move(adc_file_path, os.path.join(save_path, 'adc_data_' + id + '.bin'))
     
     return {
         'file_size': file_stat.st_size / 1024,

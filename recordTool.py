@@ -69,6 +69,16 @@ def on_check_data():
             out += "File size: {} K\nStart time: {}\nEnd time: {}\nDuration: {}s\n".format(info['file_size'], info['start_time'], info['end_time'], info['duration'])
     return out
 
+def on_save_data(record_name): 
+    global recorders
+    try: 
+        mmCollector.read_data('hori', record_name)
+        mmCollector.read_data('vert', record_name)
+        return 'Data saved successfully'
+    except Exception as e: 
+        return e
+
+
 if __name__ == '__main__': 
     # variables
     available_ports = mmCollector.search_available_ports()
@@ -96,10 +106,18 @@ if __name__ == '__main__':
             btn_to_start = gr.Button('Start record')
             btn_to_stop = gr.Button('Stop record')
             
+        with gr.Row():
+            out_listen_hori = gr.Textbox(label='Horizontal Console', placeholder="", interactive=False)
+            out_listen_vert = gr.Textbox(label='Vertical Console', placeholder="", interactive=False)
+            
         with gr.Column(): 
             btn_to_check = gr.Button('Check collected data')
             out_of_check = gr.Textbox(label='Data Info', placeholder="", interactive=False)
-            
+        
+        input_of_file_name = gr.Textbox(label='File name', placeholder='Input the file name to save')
+        btn_to_save = gr.Button('Save data')
+        out_of_save = gr.Textbox(label='Save Console', placeholder="", interactive=False)
+        
         # callback bind
         btn_to_connect.click(fn=on_connect_click, inputs=[dropdown_hori, dropdown_vert], outputs=out_of_connect)
         btn_to_set.click(fn=on_set_click, inputs=slider_to_set)
@@ -108,8 +126,10 @@ if __name__ == '__main__':
         # FPGA configuration 
         btn_to_configure.click(fn=on_configure_fpga, inputs=None, outputs=out_of_fpga_configure)
         # FPGA listening
-        btn_to_listen_hori.click(fn=lambda x: on_listen_fpga('hori'), inputs=None)
-        btn_to_listen_vert.click(fn=lambda x: on_listen_fpga('vert'), inputs=None)
+        btn_to_listen_hori.click(fn=lambda x: on_listen_fpga('hori'), inputs=None, outputs=out_listen_hori)
+        btn_to_listen_vert.click(fn=lambda x: on_listen_fpga('vert'), inputs=None, outputs=out_listen_vert)
         btn_to_check.click(fn=on_check_data, inputs=None, outputs=out_of_check)
+        btn_to_save.click(fn=on_save_data, inputs=input_of_file_name, outputs=out_of_save)
+        
     
     demo.launch()
