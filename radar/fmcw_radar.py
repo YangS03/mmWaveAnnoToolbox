@@ -26,10 +26,10 @@ class FMCWRadar(object):
         self.num_range_bins = self.config.num_range_bins
         self.num_doppler_bins = self.config.num_doppler_bins
         
-        self.wind_func = np.hanning(self.num_fast_samples)
+        self.wind_func = np.hanning
 
         
-    def read_data(self, filename):
+    def read_data(self, filename, complex=False):
         
         assert self.config.adc_sample_bits == 16
         
@@ -65,22 +65,24 @@ class FMCWRadar(object):
         # [num_frames, num_chirps, num_antenna, num_samples]
         adc_data_I_ = np.reshape(adc_data_I_, self.config.adc_shape)
         adc_data_Q_ = np.reshape(adc_data_Q_, self.config.adc_shape)
-                
-        return adc_data_I_, adc_data_Q_
-    
+        
+        if not complex:      
+            return adc_data_I_, adc_data_Q_
+        else: 
+            return adc_data_I_ + 1j * adc_data_Q_
+        
     def range_fft(self, IQ_complex, target_frame_idx=None, num_multiframe=1):
         if target_frame_idx is not None:
             # Using cupy to perform fft
             IQ_complex = IQ_complex[target_frame_idx: target_frame_idx+num_multiframe, :, :, :] # [num_multi_frames, num_chirps, num_antenna, num_fast_samples]
             IQ_samples = np.reshape(IQ_complex, (self.num_slow_samples, self.num_antenna, self.num_fast_samples))   # [num_slow_samples, num_antenna, num_fast_samples]
-            IQ_samples = np.multiply(IQ_samples, self.wind_func)  
+            IQ_samples = IQ_samples * self.wind_func(self.num_fast_samples)
             slow_time_samples = np.fft.fft(IQ_samples, n=self.num_range_bins, axis=-1)
             # [num_range_bins, num_antenna, num_slow_samples]
             slow_time_samples = np.transpose(slow_time_samples[:, :, :], (2, 1, 0))
         else: 
             # Using cupy to perform fft
-            IQ_samples = IQ_complex
-            IQ_samples = np.multiply(IQ_samples, self.wind_func)  
+            IQ_samples = IQ_complex * self.wind_func(self.num_fast_samples)  
             slow_time_samples = np.fft.fft(IQ_samples, n=self.num_range_bins, axis=-1)
             slow_time_samples = np.transpose(slow_time_samples[:, :, :], (2, 1, 0))
         assert slow_time_samples.shape == (self.num_range_bins, self.num_antenna, self.num_slow_samples)
@@ -89,7 +91,7 @@ class FMCWRadar(object):
     def doppler_fft(self, slow_time_samples):
         # Using cupy to perform fft
         # [num_range_bins, num_antenna, num_dopper_bins]
-        slow_time_samples = slow_time_samples * np.hanning(self.num_doppler_bins)
+        slow_time_samples = slow_time_samples * self.wind_func(self.num_doppler_bins)
         doppler_samples = np.fft.fft(slow_time_samples, n=self.num_doppler_bins, axis=-1)
         doppler_samples = np.fft.fftshift(doppler_samples, axes=-1)
         return doppler_samples
@@ -131,7 +133,7 @@ class FMCWRadar(object):
         # Using cupy to perform fft
         # slow_time_samples: [num_range_bins, num_antenna, num_dopper_bins]
         num_antenna = slow_time_samples.shape[1]
-        slow_time_samples = slow_time_samples * np.hanning(num_antenna)[np.newaxis, :, np.newaxis]
+        slow_time_samples = slow_time_samples * self.wind_func(num_antenna)[np.newaxis, :, np.newaxis]
         angle_samples = np.fft.fft(slow_time_samples, n=self.num_angle_bins, axis=1)
         angle_samples = np.fft.fftshift(angle_samples, axes=1)
         return angle_samples

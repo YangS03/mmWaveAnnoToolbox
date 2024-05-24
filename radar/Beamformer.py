@@ -11,11 +11,12 @@ class Beamformer(object):
         self.num_steps = num_steps
         self.num_antennas = num_antennas
         self.d_theta = np.pi / num_steps
-        self.thetas = (np.arange(0, num_steps) + 0.5) * self.d_theta - np.pi / 2
+        self.thetas = np.arange(0, num_steps) * self.d_theta - np.pi / 2
         self.steering_vector = np.zeros((num_antennas, num_steps), dtype=np.complex128)
         for idx in range(0, num_antennas):
-            # for FMCW radar, the steering vector is exp_param_0319_100cm_2(j 2 pi d sin(theta) / c)
-            self.steering_vector[idx, :] = np.exp(1j * np.pi * idx * np.sin(self.thetas))
+            # for FMCW radar, the steering vector is (j 2 pi d sin(theta) / c)
+            # self.steering_vector[idx, :] = np.exp(1j * np.pi * idx * np.sin(self.thetas))
+            self.steering_vector[idx, :] = np.exp(1j * 2 * idx * self.thetas)
     
     def beamforming_func(self, rxx):
         raise NotImplementedError
@@ -44,7 +45,6 @@ class Beamformer(object):
         if x.ndim == 3:
             # [num_range_bins, num_antennas, num_samples]
             self.num_range_bins = x.shape[0]
-            
             auto_correlation_matrix = np.einsum('mnl,mlk->mnk', x, np.conjugate(x.transpose(0, 2, 1)))
             auto_correlation_matrix_norm = np.divide(auto_correlation_matrix, \
                 np.einsum('mii->m', auto_correlation_matrix)[:, np.newaxis, np.newaxis])  
@@ -104,6 +104,35 @@ class CaponBeamformer(Beamformer):
             return weights
 
 
+class MUSICBeamformer(): 
+    def __init__(self, num_steps, num_antennas):
+        self.num_steps = num_steps
+        self.num_antennas = num_antennas
+        self.d_theta = np.pi / num_steps
+        self.thetas = np.arange(0, num_steps) * self.d_theta - np.pi / 2
+        self.steering_vector = np.zeros((num_antennas, num_steps), dtype=np.complex128)
+        for idx in range(0, num_antennas):
+            # for FMCW radar, the steering vector is (j 2 pi d sin(theta) / c)
+            # self.steering_vector[idx, :] = np.exp(1j * np.pi * idx * np.sin(self.thetas))
+            self.steering_vector[idx, :] = np.exp(1j * 2 * idx * self.thetas)
+    
+    def steering(self, x):
+        assert x.ndim == 2, "The input data should have 2 dimensions"
+        # [num_antennas, num_samples]
+        auto_correlation_matrix = np.matmul(x, np.conjugate(x.transpose(1, 0)))
+        auto_correlation_matrix_norm = np.divide(auto_correlation_matrix, \
+            np.diag(auto_correlation_matrix)[:, np.newaxis])
+        lambda_, v = np.linalg.eigh(auto_correlation_matrix_norm)
+        v[:, np.argmax(lambda_)] = 0
+        auto_correlation_matrix_noise = np.matmul(v, np.conjugate(v.transpose(1, 0)))
+        w = self.steering_vector
+        w_H = np.conj(w).transpose()
+        power_spectrum = np.matmul(np.matmul(w_H, auto_correlation_matrix_noise), w)
+        power_spectrum = np.diag(power_spectrum)
+        power_spectrum = 1 / power_spectrum
+        return power_spectrum
+        
+
 # class RobustCaponBeamformer(Beamformer):
 #     def __init__(self, num_steps, num_antennas, antenna_gain_mat=None, threshold=0.2):
 #         super(RobustCaponBeamformer, self).__init__(num_steps, num_antennas)
@@ -135,7 +164,6 @@ class CaponBeamformer(Beamformer):
             
 #         return weights
 
-
 #     def estimate_robust_steering_vector(self, rxx_norm, sv_guess):
         
 #         import cupy as np
@@ -162,7 +190,6 @@ class CaponBeamformer(Beamformer):
 #         sv_est = np.array(sv_est)
         
 #         return sv_est
-    
     
 #     def estimate_robust_steering_vector_torch(self, rxx_norm, sv_guess):
         

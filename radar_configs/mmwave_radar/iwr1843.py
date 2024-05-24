@@ -25,9 +25,9 @@ mmwave.file_size = mmwave.num_chirps * \
     mmwave.num_frames * mmwave.num_fast_samples * \
         mmwave.num_rx * mmwave.num_tx * mmwave.num_lanes 
 
-mmwave.num_range_bins = 64
+mmwave.num_range_bins = 256
 mmwave.num_angle_bins = 64
-mmwave.num_elevation_bins = 8
+mmwave.num_elevation_bins = 64
 mmwave.num_doppler_bins = 64
 
 mmwave.num_antenna = mmwave.num_rx * mmwave.num_tx
