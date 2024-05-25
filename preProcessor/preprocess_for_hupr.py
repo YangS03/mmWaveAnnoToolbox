@@ -24,15 +24,15 @@ class PreProcessor:
         with open(os.path.join(source_path_folder, "config.yaml"), 'r') as f:
             mmwave_cfg = yaml.load(f, Loader=yaml.FullLoader)
         
-        path_bin_vert = os.path.join(source_path_folder, "adc_data_vert.bin")
         path_bin_hori = os.path.join(source_path_folder, "adc_data_hori.bin")
+        path_bin_vert = os.path.join(source_path_folder, "adc_data_vert.bin")
         
         return mmwave_cfg, path_bin_vert, path_bin_hori
     
     def process_data(self, path_bin_hori, path_bin_vert): 
 
-        data_complex_hori = self.radar.read_data(path_bin_vert, complex=True)
-        data_complex_vert = self.radar.read_data(path_bin_hori, complex=True)
+        data_complex_hori = self.radar.read_data(path_bin_hori, complex=True)
+        data_complex_vert = self.radar.read_data(path_bin_vert, complex=True)
         # cube_complex_hori = np.zeros((
         #     self.radar.num_frames, 
         #     self.radar.num_range_bins,
@@ -53,14 +53,15 @@ class PreProcessor:
     
             # cube_complex_hori[idx_frame] = cube_frame_vert.get()    # from cupy to numpy
             # cube_complex_vert[idx_frame] = cube_frame_hori.get()
-            cube_complex_hori['%9d' % idx_frame] = cube_frame_vert.get()    # from cupy to numpy
-            cube_complex_vert['%9d' % idx_frame] = cube_frame_hori.get()
+            cube_complex_hori['%09d' % idx_frame] = cube_frame_vert.get()    # from cupy to numpy
+            cube_complex_vert['%09d' % idx_frame] = cube_frame_hori.get()
             
         self.save_data(cube_complex_hori, cube_complex_vert)
 
     def process_data_frame(self, data_frame):
         data_8rx, data_4rx = self.radar.parse_data(data_frame)
         data_cube = self.radar.get_RAED_data(data_8rx, data_4rx)    # [range, azimuth, elevation, doppler]
+        data_cube = data_cube[94: 30: -1, :, :, 24: 40]     # select specific range and velocity
         return data_cube
 
     def save_data(self, data_hori, data_vert): 

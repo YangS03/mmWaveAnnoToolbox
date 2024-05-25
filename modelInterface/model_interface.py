@@ -22,15 +22,15 @@ import pytorch_lightning as pl
 
 
 class MInterface(pl.LightningModule):
-    def __init__(self, network_cfg, model_cfg, loss_cfg, lr_cfg, **kwargs):
+    def __init__(self, module: nn.Module, model_dict, model_state_dict, **kwargs):
         super().__init__()
         self.save_hyperparameters()
         
-        self.load_model()
+        self.load_model(module, model_dict, model_state_dict)
         self.configure_loss()
 
     def forward(self, x):
-        return x
+        return self.model(x)
 
     def training_step(self, batch, batch_idx):
         return 
@@ -62,5 +62,7 @@ class MInterface(pl.LightningModule):
     def configure_loss(self):
         return
 
-    def load_model(self):
-        return
+    def load_model(self, module: nn.Module, model_dict: dict, model_state_dict: dict=None) -> nn.Module:
+        self.model: nn.Module = module(**model_dict)
+        if model_dict is not None:
+            self.model.load_state_dict(model_state_dict)

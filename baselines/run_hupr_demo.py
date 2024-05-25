@@ -13,9 +13,10 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
 
+from modelInterface.model_interface import MInterface
 from HuPR.models import HuPRNet
 from HuPR.misc import get_max_preds, generateTarget
-from HuPR.datasets.base import Normalize, trans
+from HuPR.datasets.base import Normalize
 from HuPR.main import obj
 
 
@@ -95,7 +96,7 @@ if __name__ == "__main__":
         cfg = obj(cfg)
     
     # simplified dataloader  
-    index = 98
+    index = 10
     duration = 100
     numGroupFrames = 8
     numChirps = 16
@@ -108,14 +109,14 @@ if __name__ == "__main__":
     
     VRDAEmaps_hori = torch.zeros((numGroupFrames, numFrames, 2, rangeSize, azimuthSize, elevationSize))
     VRDAEmaps_vert = torch.zeros((numGroupFrames, numFrames, 2, rangeSize, azimuthSize, elevationSize))
-    VRDAERealImag_hori_frames = np.load("data/HuPR/test/data_hori.npy")
-    VRDAERealImag_vert_frames = np.load("data/HuPR/test/data_vert.npy")
+    VRDAERealImag_hori_frames = np.load("data/HuPR/test/data_hori.npz")
+    VRDAERealImag_vert_frames = np.load("data/HuPR/test/data_vert.npz")
     
     frames = np.clip(range(index - numGroupFrames//2, index + numGroupFrames//2), 0, duration - 1)
     for idx, idx_frame in enumerate(frames):
-    
-        VRDAERealImag_hori = VRDAERealImag_hori_frames[idx_frame]
-        VRDAERealImag_vert = VRDAERealImag_vert_frames[idx_frame]
+        
+        VRDAERealImag_hori = VRDAERealImag_hori_frames['%09d' % idx_frame]
+        VRDAERealImag_vert = VRDAERealImag_vert_frames['%09d' % idx_frame]
         
         idxSampleChirps = 0
         for idxChirps in range(numChirps//2 - numFrames//2, numChirps//2 + numFrames//2):   # select the low-velocity chirps
@@ -130,7 +131,8 @@ if __name__ == "__main__":
     VRDAEmaps_vert = VRDAEmaps_vert.unsqueeze(0).to('cuda')
     
     checkpoint = torch.load(os.path.join('./log/mscsa_prgcn/model_best.pth'))
-    model = HuPRNet(cfg)
+    model = MInterface(HuPRNet, model_dict={'cfg': cfg}, model_state_dict=checkpoint)
+    
     model.load_state_dict(checkpoint['model_state_dict'])
     model.to('cuda')
     model.eval()

@@ -42,10 +42,10 @@ class FMCWRadar(object):
             "Real filesize: " + str(filesize) + " Enpected filesize: " + str(self.config.file_size)
         
         # swap - must deep copy; adc_data: [I1, Q1, I2, Q2, ..., In, Qn]
-        # adc_data_1 = deepcopy(adc_data[1: filesize: 4])
-        # adc_data_2 = deepcopy(adc_data[2: filesize: 4])
-        # adc_data[2: filesize: 4] = adc_data_1
-        # adc_data[1: filesize: 4] = adc_data_2
+        adc_data_1 = deepcopy(adc_data[1: filesize: 4])
+        adc_data_2 = deepcopy(adc_data[2: filesize: 4])
+        adc_data[2: filesize: 4] = adc_data_1
+        adc_data[1: filesize: 4] = adc_data_2
         
         # print("filesize: ", filesize)
         # print("num_frames: ", self.config.num_frames)
@@ -56,12 +56,12 @@ class FMCWRadar(object):
         adc_data_I = adc_data[0: filesize: 2]
         adc_data_Q = adc_data[1: filesize: 2]
         
-        # ATTENTION: data capture using API, I and Q are swapped
-        adc_data_I_ = deepcopy(adc_data_Q)
-        adc_data_Q_ = deepcopy(adc_data_I)
+        # ATTENTION: data capture using API, I and Q are swapped (?)
+        # adc_data_I_ = deepcopy(adc_data_Q)
+        # adc_data_Q_ = deepcopy(adc_data_I)
         
-        # adc_data_I_ = deepcopy(adc_data_I)
-        # adc_data_Q_ = deepcopy(adc_data_Q)
+        adc_data_I_ = deepcopy(adc_data_I)
+        adc_data_Q_ = deepcopy(adc_data_Q)
         
         # [num_frames, num_chirps, num_antenna, num_samples]
         adc_data_I_ = np.reshape(adc_data_I_, self.config.adc_shape)
@@ -87,18 +87,20 @@ class FMCWRadar(object):
             slow_time_samples = np.transpose(slow_time_samples[:, :, :], (2, 1, 0))
         else: 
             # Using cupy to perform fft
-            IQ_samples = IQ_complex * self.wind_func(self.num_fast_samples)  
+            IQ_samples = IQ_complex
+            IQ_samples = IQ_samples * self.wind_func(self.num_fast_samples)  
             slow_time_samples = np.fft.fft(IQ_samples, n=self.num_range_bins, axis=-1)
             slow_time_samples = np.transpose(slow_time_samples[:, :, :], (2, 1, 0))
         # assert slow_time_samples.shape == (self.num_range_bins, self.num_antenna, self.num_slow_samples)
         return slow_time_samples
     
-    def doppler_fft(self, slow_time_samples):
+    def doppler_fft(self, slow_time_samples, axis=-1, shift=True):
         # Using cupy to perform fft
         # [num_range_bins, num_antenna, num_dopper_bins]
         slow_time_samples = slow_time_samples * self.wind_func(self.num_doppler_bins)
-        doppler_samples = np.fft.fft(slow_time_samples, n=self.num_doppler_bins, axis=-1)
-        doppler_samples = np.fft.fftshift(doppler_samples, axes=-1)
+        doppler_samples = np.fft.fft(slow_time_samples, n=self.num_doppler_bins, axis=axis)
+        if shift: 
+            doppler_samples = np.fft.fftshift(doppler_samples, axes=axis)
         return doppler_samples
     
     def phase_error_compensation(self, slow_time_samples):
@@ -121,6 +123,8 @@ class FMCWRadar(object):
         rx = self.config.num_rx
         radar_data_8rx = IQ_complex[:, :rx * 2, :]
         radar_data_4rx = IQ_complex[:, rx * 2:, :]
+        # radar_data_8rx = np.concatenate([IQ_complex[:, :rx, :], IQ_complex[:, rx * 2:, :]], axis=1)
+        # radar_data_4rx = IQ_complex[:, rx: rx * 2, :]
         return radar_data_8rx, radar_data_4rx
         
     def get_window_sample(self, slow_time_samples, window_size, window_step=1, sample_mothod="sliding"):
@@ -134,35 +138,27 @@ class FMCWRadar(object):
                 window_slow_time_samples[idx_wind, :, :, :] = sub_slow_time_samples    
         return window_slow_time_samples
             
-    def angle_fft(self, slow_time_samples):
+    def angle_fft(self, slow_time_samples, axis=1, shift=True):
         # Using cupy to perform fft
         # slow_time_samples: [num_range_bins, num_antenna, num_dopper_bins]
         num_antenna = slow_time_samples.shape[1]
-        slow_time_samples = slow_time_samples * self.wind_func(num_antenna)[np.newaxis, :, np.newaxis]
-        angle_samples = np.fft.fft(slow_time_samples, n=self.num_angle_bins, axis=1)
-        angle_samples = np.fft.fftshift(angle_samples, axes=1)
+        angle_samples = np.fft.fft(slow_time_samples, n=self.num_angle_bins, axis=axis)
+        if shift: 
+            angle_samples = np.fft.fftshift(angle_samples, axes=axis)
         return angle_samples
     
-    def elevation_fft(self, slow_time_samples):
+    def elevation_fft(self, slow_time_samples, axis=2, shift=True):
         # Using cupy to perform fft
-        # slow_time_samples: [num_range_bins, num_angle_bins, num_elevate, num_dopper_bins]
-        angle_samples = np.fft.fft(slow_time_samples, n=self.num_elevation_bins, axis=2)
-        angle_samples = np.fft.fftshift(angle_samples, axes=2)
-        return angle_samples
+        elevation_samples = np.fft.fft(slow_time_samples, n=self.num_elevation_bins, axis=axis)
+        if shift: 
+            elevation_samples = np.fft.fftshift(elevation_samples, axes=axis)
+        return elevation_samples
     
-    def remove_direct_component(self, range_ffts):
-        num_slow_time_samples = range_ffts.shape[-1]
-        shape_len = len(range_ffts.shape)
-
-        if shape_len == 3:
-            mean_vals = np.repeat(np.mean(range_ffts, axis=2)[:, :, np.newaxis], num_slow_time_samples, axis=2)
-            return range_ffts - mean_vals
-        elif shape_len == 4:
-            mean_vals = np.repeat(np.mean(range_ffts, axis=3)[:, :, :, np.newaxis], num_slow_time_samples, axis=3)
-            return range_ffts - mean_vals
-        else:
-            assert 1 == 0, "Wrong dimension to remove DC!!!"
-
+    def remove_direct_component(self, input_val, axis=-1):
+        mean_val = np.mean(input_val, axis=axis)
+        out_val = input_val - np.expand_dims(mean_val, axis=axis)
+        return out_val
+        
     def perform_beamforming(self, slow_time_samples, update_gain_mat=False):
         """
             input: 
@@ -215,19 +211,22 @@ class FMCWRadar(object):
 
     def get_RAED_data(self, radar_data_8rx, radar_data_4rx): 
         # Get range data
+        radar_data_8rx = self.remove_direct_component(radar_data_8rx, axis=0)
+        radar_data_4rx = self.remove_direct_component(radar_data_4rx, axis=0)
         radar_data_8rx = self.range_fft(radar_data_8rx)
         radar_data_4rx = self.range_fft(radar_data_4rx)
-        # Remove direct component
-        radar_data_8rx = self.remove_direct_component(radar_data_8rx)
-        radar_data_4rx = self.remove_direct_component(radar_data_4rx)
         # Get doppler data
-        radar_data_8rx = self.doppler_fft(radar_data_8rx)
-        radar_data_4rx = self.doppler_fft(radar_data_4rx)
+        radar_data_8rx = self.doppler_fft(radar_data_8rx, shift=False)
+        radar_data_4rx = self.doppler_fft(radar_data_4rx, shift=False)
+        # Padding to align: [range, azimuth, elevation, doppler]
+        radar_data_4rx = np.pad(radar_data_4rx, ((0, 0), (2, 2), (0, 0)))
+        radar_data = np.stack([radar_data_8rx, radar_data_4rx], axis=2) 
+        radar_data = np.pad(radar_data, ((0, 0), (0, 0), (0, self.num_elevation_bins - 2), (0, 0)))
+        # Get elevation data (along specific antenna)
+        radar_data[:, 2: 6,:, :] = self.elevation_fft(radar_data[:, 2: 6,:, :], axis=-2, shift=False)
         # Get angle data
-        radar_data_8rx = self.angle_fft(radar_data_8rx)
-        radar_data_4rx = self.angle_fft(radar_data_4rx)
-        radar_data = np.stack([radar_data_8rx, radar_data_4rx], axis=2)
-        # Get elevation data
-        radar_data = self.elevation_fft(radar_data)
-        radar_data = np.abs(radar_data)
+        radar_data = self.angle_fft(radar_data, shift=False)
+        # Shift the fft result
+        radar_data = np.fft.fftshift(radar_data, axes=(1, 2, 3))
+        
         return radar_data
