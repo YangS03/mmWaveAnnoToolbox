@@ -1,3 +1,6 @@
 [submodule "baselines/HuPR"]
 	path = baselines/HuPR
 	url = git@github.com:luckyyf0517/HuPR.git
+[submodule "baselines/mmMesh"]
+	path = baselines/mmMesh
+	url = git@github.com:luckyyf0517/mmMesh.git
