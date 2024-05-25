@@ -6,4 +6,4 @@
 	url = git@github.com:luckyyf0517/mmMesh.git
 [submodule "baselines/mmDiff"]
 	path = baselines/mmDiff
-	url = https://github.com/FanJunqiao/mmDiff.git
+	url = git@github.com:luckyyf0517/mmDiff.git
