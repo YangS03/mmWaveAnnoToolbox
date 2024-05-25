@@ -14,9 +14,24 @@ def on_connect_click(port_hori, port_vert):
         if port_vert and port_vert != 'None': 
             port_vert = available_ports[port_vert]
             recorders['vert'] = mmCollector.mmWaveRecoder(port=port_vert, device='iwr1843')
-        return 'Connect successful'
+        return 'Connect successful, available ports are {}'.format(available_ports)
     except: 
         return 'Connect failed'
+    
+
+def on_connect_click_two(port_hori, port_vert):
+    global recorders, available_ports
+    try: 
+        if port_hori and port_hori != 'None': 
+            port_hori = available_ports[port_hori]
+            recorders['hori'] = mmCollector.mmWaveRecoder(port=port_hori, device='iwr1843')
+        if port_vert and port_vert != 'None': 
+            port_vert = available_ports[port_vert]
+            recorders['vert'] = mmCollector.mmWaveRecoder(port=port_vert, device='iwr1843')
+        return 'Connect successful'
+    except: 
+        return 'Connect failed'    
+
 
 def on_set_click(num_frames): 
     global recorders, sending_status
@@ -41,14 +56,13 @@ def on_stop_click():
                 rec.send_stop()
     sending_status = False
     
-def on_configure_fpga(): 
+def on_configure_fpga(id): 
     global recorders
     out = ''
-    for id in recorders.keys():
-        rec = recorders[id]
-        if rec is not None:
-            out += '[Output for {}]\n'.format(id)
-            out += mmCollector.configure_fpga(id)
+    rec = recorders[id]
+    if rec is not None:
+        out += '[Output for {}]\n'.format(id)
+        out += mmCollector.configure_fpga(id)
     return out
 
 def on_listen_fpga(id): 
@@ -86,15 +100,21 @@ if __name__ == '__main__':
     sending_status = False
     
     with gr.Blocks() as demo:
-        # connect to the mmWave sensor        
+        # connect to the mmWave sensor using serial port
         dropdown_options = ['None'] + list(available_ports.keys())
         dropdown_hori = gr.Dropdown(choices=dropdown_options, label='Serial Port', info='Select the serial port of horizontal radar') 
         dropdown_vert = gr.Dropdown(choices=dropdown_options, label='Serial Port', info='Select the serial port of vertical radar') 
         btn_to_connect = gr.Button("Connect")
         out_of_connect = gr.Textbox(label='Connect Console', placeholder="", interactive=False)
+        # configure the mmWave sensor
+        with gr.Row(): 
+            btn_to_configure_hori = gr.Button('Configure Horizontal FPGA')
+            btn_to_configure_vert = gr.Button('Configure Vertical FPGA')
             
-        btn_to_configure = gr.Button('Configure FPGA')
-        out_of_fpga_configure = gr.Textbox(label='Horizontal Console', placeholder="", interactive=False)
+        with gr.Row(): 
+            out_of_fpga_configure_hori = gr.Textbox(label='Horizontal Console', placeholder="", interactive=False)
+            out_of_fpga_configure_vert = gr.Textbox(label='Vertical Console', placeholder="", interactive=False)
+        
         with gr.Row(): 
             btn_to_listen_hori = gr.Button('Begin FPGA listening - Horizontal')
             btn_to_listen_vert = gr.Button('Begin FPGA listening - Vertical')
@@ -114,7 +134,7 @@ if __name__ == '__main__':
             btn_to_check = gr.Button('Check collected data')
             out_of_check = gr.Textbox(label='Data Info', placeholder="", interactive=False)
         
-        input_of_file_name = gr.Textbox(label='File name', placeholder='Input the file name to save')
+        input_of_file_name = gr.Textbox(label='File name', info="Check two latest data collect first!", placeholder='Input the file name to save')
         btn_to_save = gr.Button('Save data')
         out_of_save = gr.Textbox(label='Save Console', placeholder="", interactive=False)
         
@@ -124,12 +144,12 @@ if __name__ == '__main__':
         btn_to_start.click(fn=on_start_click, inputs=None)
         btn_to_stop.click(fn=on_stop_click, inputs=None)
         # FPGA configuration 
-        btn_to_configure.click(fn=on_configure_fpga, inputs=None, outputs=out_of_fpga_configure)
-        # FPGA listening
+        btn_to_configure_hori.click(fn=lambda x: on_configure_fpga('hori'), inputs=None, outputs=out_of_fpga_configure_hori)
+        btn_to_configure_hori.click(fn=lambda x: on_configure_fpga('vert'), inputs=None, outputs=out_of_fpga_configure_vert)
+        # FPGA listening 
         btn_to_listen_hori.click(fn=lambda x: on_listen_fpga('hori'), inputs=None, outputs=out_listen_hori)
         btn_to_listen_vert.click(fn=lambda x: on_listen_fpga('vert'), inputs=None, outputs=out_listen_vert)
         btn_to_check.click(fn=on_check_data, inputs=None, outputs=out_of_check)
         btn_to_save.click(fn=on_save_data, inputs=input_of_file_name, outputs=out_of_save)
-        
     
     demo.launch()

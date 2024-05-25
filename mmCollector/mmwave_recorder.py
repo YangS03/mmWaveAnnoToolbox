@@ -76,13 +76,14 @@ class mmWaveRecoder:
             self._overwrite_config('frameCfg', '0 2 64 {} 100.0 1 0'.format(int(num_frames)))
         for data in self.serial_data:
             self._write_serial(data)
+        self.first_frame = True
     
     def send_start(self):
         self._write_serial('sensorStart')      
-        # if self.first_frame: 
-        #     self._write_serial('sensorStart')      
-        # else: 
-        #     self._write_serial('sensorStart 0')        
+        if self.first_frame: 
+            self._write_serial('sensorStart')      
+        else: 
+            self._write_serial('sensorStart 0')        
         
     def send_stop(self):
         self._write_serial('sensorStop')    
@@ -92,8 +93,5 @@ class mmWaveRecoder:
 if __name__ == '__main__': 
     recoder = mmWaveRecoder(port='COM18', device='iwr1843')
     recoder.show_config()
-    while True: 
-        recoder.send_start()
-        time.sleep(1)
-        recoder.send_stop()
-        time.sleep(1)
+    recoder.send_config()
+    recoder.send_start()
