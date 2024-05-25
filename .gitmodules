@@ -1,0 +1,3 @@
+[submodule "baselines/HuPR"]
+	path = baselines/HuPR
+	url = https://github.com/robert80203/HuPR-A-Benchmark-for-Human-Pose-Estimation-Using-Millimeter-Wave-Radar.git
