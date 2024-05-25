@@ -125,8 +125,8 @@ if __name__ == '__main__':
         vis.add_geometry(o3d.geometry.TriangleMesh.create_coordinate_frame(size=5.0))
 
     radar = FMCWRadar(cfg)
-    bin_filename = r"E:\CollectedData\wxg_test\2024-05-24-17-18-12\adc_data_vert.bin"
-    # bin_filename = r"E:\CollectedData\wxg_test\2024-05-24-17-18-12\adc_data_hori.bin"
+    # bin_filename = r"E:\CollectedData\wxg_test\2024-05-24-17-18-12\adc_data_vert.bin"
+    bin_filename = r"E:\CollectedData\wxg_test\2024-05-24-17-18-12\adc_data_hori.bin"
     bin_data = radar.read_data(bin_filename, complex=True)
     # for idx_frame in range(cfg.mmwave.num_frames):
     idx_global = 0
@@ -140,13 +140,10 @@ if __name__ == '__main__':
         # update point cloud dynamically
         if use_viz: 
             pcd.points = o3d.utility.Vector3dVector(pointcloud[:, :3])
-            color_map = repeat(pointcloud[:, 4], 'n -> n 3')
-            color_map = 1 - color_map / color_map.max()
-            pcd.colors = o3d.utility.Vector3dVector(color_map)
             vis.update_geometry(pcd)
             vis.poll_events()
             vis.update_renderer()
-            time.sleep(0.1)
+            time.sleep(max(0, 0.1 - (time.time() - tic)))
             
         if use_plt: 
             plt.pause(0.01)
