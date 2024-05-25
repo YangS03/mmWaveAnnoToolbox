@@ -30,7 +30,7 @@ class MInterface(pl.LightningModule):
         self.configure_loss()
 
     def forward(self, x):
-        return self.model(x)
+        return self.model(**x)
 
     def training_step(self, batch, batch_idx):
         return 

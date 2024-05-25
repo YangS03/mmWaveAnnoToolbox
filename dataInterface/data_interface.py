@@ -23,69 +23,39 @@ from torch.utils.data import DataLoader, ConcatDataset, Sampler, DistributedSamp
 
 class DInterface(pl.LightningDataModule):
 
-    def __init__(self, dataset_cfg=None, data_cfg=None):
+    def __init__(self, batch_size=16, num_workers=8, dataset=None, dataset_dict=None):
         super().__init__()
-        self.dataset_cfg = dataset_cfg
-        self.dataset_cfg.update(data_cfg)
         
-        self.num_workers = self.dataset_cfg['num_workers']
-        self.dataset = self.dataset_cfg['dataset']
-        self.batch_size = self.dataset_cfg['batch_size']
+        self.num_workers = num_workers
+        self.batch_size = batch_size
 
-        self.load_data_module()
+        self.load_data_module(dataset, dataset_dict)
 
     def setup(self, stage=None):
-        # load empty file list config
-        if 'skip_empty_rd' in self.dataset_cfg and self.dataset_cfg['skip_empty_rd']:
-            with open('configs/data/non_empty_files.yaml', 'r') as f:
-                self.dataset_cfg['train_data_if_skip'] = yaml.load(f, Loader=yaml.FullLoader)
-        else:
-            self.dataset_cfg['train_data_if_skip'] = None
-
         if stage == 'fit':
-            self.trainset = self.generate_dataset('train')
-            self.valset = self.generate_dataset('test')
+            self.train_set = self.generate_dataset('train')
+            self.val_set = self.generate_dataset('test')
         elif stage == 'test':
-            self.testset = self.generate_dataset('test')
+            self.test_set = self.generate_dataset('test')
         else: 
             raise ValueError(f"Invalid stage: {stage}")
 
-    def generate_dataset(self, set_type):
-        sets = self.dataset_cfg['path'][set_type + "_sets"]
-
-        datasets = []
-        for subset_data in sets:
-            subsets = sets[subset_data]
-            for subset in subsets:
-                datasets.append(self.Dataset(set_type=set_type, subset=subset, use_camera=True, dataset_cfg=self.dataset_cfg))
-        return datasets
+    def generate_dataset(self, stage):
+        return self.Dataset(phase=stage, **self.dataset_dict)
 
     def train_dataloader(self):
-        dataset = ConcatDataset(self.trainset)
-        sampler = SubsetSampler([len(subset) for subset in self.trainset], shuffle=True)
-        return DataLoader(dataset, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False, sampler=sampler)
+        return DataLoader(self.train_set, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False)
 
     def val_dataloader(self):
-        dataset = ConcatDataset(self.valset)
-        sampler = SubsetSampler([len(subset) for subset in self.valset], shuffle=False)
-        return DataLoader(dataset, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False, sampler=sampler)
+        return DataLoader(self.val_set, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False)
 
     def test_dataloader(self):
-        dataset = ConcatDataset(self.testset)
-        sampler = SubsetSampler([len(subset) for subset in self.testset], shuffle=False)
-        return DataLoader(dataset, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False, sampler=sampler)
+        return DataLoader(self.test_set, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False)
 
-    def load_data_module(self):
-        name = self.dataset
-        # Change the `snake_case.py` file name to `CamelCase` class name.
-        # Please always name your model file name as `snake_case.py` and
-        # class name corresponding `CamelCase`.
-        camel_name = ''.join([i.capitalize() for i in name.split('_')])
-        try:
-            self.Dataset = getattr(importlib.import_module('.'+name, package=__package__), camel_name)
-        except:
-            raise ValueError(f'Invalid Dataset File Name or Invalid Class Name data.{name}.{camel_name}')
-
+    def load_data_module(self, dataset, dataset_dict):
+        self.Dataset = dataset
+        self.dataset_dict = dataset_dict
+        
 
 class SubsetSampler(Sampler):
     def __init__(self, dataset_sizes, shuffle=False):
