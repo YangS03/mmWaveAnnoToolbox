@@ -43,9 +43,10 @@ if __name__ == "__main__":
     model.to('cuda')
     model.eval()
     
-    data = DInterface(dataset=HuPR3D_simple, dataset_dict={'cfg': cfg, 'args': args})
+    data = DInterface(batch_size=8, dataset=HuPR3D_simple, dataset_dict={'cfg': cfg, 'args': args})
     data.setup(stage='test')
     
+    print('Start testing...')
     for batch in data.test_dataloader(): 
         VRDAEmap_hori = batch['VRDAEmap_hori'].cuda()
         VRDAEmap_vert = batch['VRDAEmap_vert'].cuda()

@@ -6,6 +6,7 @@ import os
 import yaml
 import numpy as np
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 from mmRadar import FMCWRadar
 
@@ -40,7 +41,7 @@ class PreProcessor:
     
             cube_frame_vert = self.process_data_frame(data_frame_hori)
             cube_frame_hori = self.process_data_frame(data_frame_vert)
-    
+            
             cube_complex_hori = cube_frame_vert.get()    # from cupy to numpy
             cube_complex_vert = cube_frame_hori.get()
             
@@ -49,12 +50,17 @@ class PreProcessor:
     def process_data_frame(self, data_frame):
         data_8rx, data_4rx = self.radar.parse_data(data_frame)
         data_cube = self.radar.get_RAED_data(data_8rx, data_4rx)    # [range, azimuth, elevation, doppler]
-        data_cube = data_cube[94: 30: -1, :, :, 24: 40]     # select specific range and velocity
         return data_cube
 
     def save_data(self, data_hori, data_vert, idx): 
         os.makedirs(os.path.join(self.target_dir, 'hori'), exist_ok=True)
         os.makedirs(os.path.join(self.target_dir, 'vert'), exist_ok=True)
+        
+        plt.ion()
+        plt.clf()
+        plt.imshow(np.sum(np.abs(data_hori), axis=(2, 3)))
+        plt.pause(0.01)
+        
         np.save(os.path.join(self.target_dir, 'hori', "%09d.npy" % idx), data_hori)
         np.save(os.path.join(self.target_dir, 'vert', "%09d.npy" % idx), data_vert)
 

@@ -41,11 +41,13 @@ class FMCWRadar(object):
         assert filesize == self.config.file_size, \
             "Real filesize: " + str(filesize) + " Enpected filesize: " + str(self.config.file_size)
         
-        # swap - must deep copy; adc_data: [I1, Q1, I2, Q2, ..., In, Qn]
-        adc_data_1 = deepcopy(adc_data[1: filesize: 4])
-        adc_data_2 = deepcopy(adc_data[2: filesize: 4])
-        adc_data[2: filesize: 4] = adc_data_1
-        adc_data[1: filesize: 4] = adc_data_2
+        
+        # # swap - must deep copy; adc_data: [I1, I2, Q1, Q2, ...] -> [I1, Q1, I2, Q2, ..., In, Qn]
+        # # no need if using DCA1000 CLI 
+        # adc_data_1 = deepcopy(adc_data[1: filesize: 4])
+        # adc_data_2 = deepcopy(adc_data[2: filesize: 4])
+        # adc_data[2: filesize: 4] = adc_data_1
+        # adc_data[1: filesize: 4] = adc_data_2
         
         # print("filesize: ", filesize)
         # print("num_frames: ", self.config.num_frames)
@@ -56,16 +58,19 @@ class FMCWRadar(object):
         adc_data_I = adc_data[0: filesize: 2]
         adc_data_Q = adc_data[1: filesize: 2]
         
-        # ATTENTION: data capture using API, I and Q are swapped (?)
-        # adc_data_I_ = deepcopy(adc_data_Q)
-        # adc_data_Q_ = deepcopy(adc_data_I)
-        
-        adc_data_I_ = deepcopy(adc_data_I)
-        adc_data_Q_ = deepcopy(adc_data_Q)
+        # ATTENTION: data capture using API, I and Q are swapped (I in MSB, Q in LSB)
+        adc_data_I_ = deepcopy(adc_data_Q)
+        adc_data_Q_ = deepcopy(adc_data_I)
         
         # [num_frames, num_chirps, num_antenna, num_samples]
         adc_data_I_ = np.reshape(adc_data_I_, self.config.adc_shape)
         adc_data_Q_ = np.reshape(adc_data_Q_, self.config.adc_shape)
+        
+        import matplotlib.pyplot as plt
+        phi = np.angle(adc_data_I_ + 1j * adc_data_Q_)[0, 0, 1, :]
+        phi = np.unwrap(phi)
+        plt.plot(phi.get())
+        plt.show()
         
         if not complex:      
             return adc_data_I_, adc_data_Q_
@@ -194,7 +199,6 @@ class FMCWRadar(object):
         return slow_time_signal 
 
     def get_spectrum_data(self, slow_time_samples, method='beamform'): 
-        slow_time_samples = self.remove_direct_component(slow_time_samples)
         
         if method == 'beamform':
             # Get angle data
@@ -211,10 +215,11 @@ class FMCWRadar(object):
 
     def get_RAED_data(self, radar_data_8rx, radar_data_4rx): 
         # Get range data
-        radar_data_8rx = self.remove_direct_component(radar_data_8rx, axis=0)
-        radar_data_4rx = self.remove_direct_component(radar_data_4rx, axis=0)
         radar_data_8rx = self.range_fft(radar_data_8rx)
         radar_data_4rx = self.range_fft(radar_data_4rx)
+        radar_data_8rx = self.remove_direct_component(radar_data_8rx, axis=-1)
+        radar_data_4rx = self.remove_direct_component(radar_data_4rx, axis=-1)
+        
         # Get doppler data
         radar_data_8rx = self.doppler_fft(radar_data_8rx, shift=False)
         radar_data_4rx = self.doppler_fft(radar_data_4rx, shift=False)
@@ -229,4 +234,11 @@ class FMCWRadar(object):
         # Shift the fft result
         radar_data = np.fft.fftshift(radar_data, axes=(1, 2, 3))
         
+        # Get the specific range
+        range_peak = np.argmax(np.abs(radar_data).sum(axis=(1, 2, 3)), axis=0)
+        radar_data = radar_data[range_peak - 32: range_peak + 32, :, :, :]
+                
+        # Select specific velocity
+        radar_data = radar_data[:, :, :, self.num_doppler_bins // 2 - 8: self.num_doppler_bins // 2 + 8]
+
         return radar_data
