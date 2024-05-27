@@ -7,6 +7,6 @@
 [submodule "baselines/mmDiff"]
 	path = baselines/mmDiff
 	url = https://github.com/luckyyf0517/mmDiff.git
-[submodule "anotation_tool"]
-	path = anotation_tool
-	url = https://github.com/luckyyf0517/mm_anotation_tool.git
+[submodule "annotation_tool"]
+	path = annotation_tool
+	url = https://github.com/luckyyf0517/mm_annotation_tool.git
