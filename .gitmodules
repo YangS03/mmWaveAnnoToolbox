@@ -1,12 +1,12 @@
 [submodule "baselines/HuPR"]
 	path = baselines/HuPR
-	url = git@github.com:luckyyf0517/HuPR.git
+	url = https://github.com/luckyyf0517/HuPR.git
 [submodule "baselines/mmMesh"]
 	path = baselines/mmMesh
-	url = git@github.com:luckyyf0517/mmMesh.git
+	url = https://github.com/luckyyf0517/mmMesh.git
 [submodule "baselines/mmDiff"]
 	path = baselines/mmDiff
-	url = git@github.com:luckyyf0517/mmDiff.git
+	url = https://github.com/luckyyf0517/mmDiff.git
 [submodule "anotation_tool"]
 	path = anotation_tool
-	url = git@github.com:luckyyf0517/mm_anotation_tool.git
+	url = https://github.com/luckyyf0517/mm_anotation_tool.git
