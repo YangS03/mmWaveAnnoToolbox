@@ -14,15 +14,15 @@ from mmRadar import FMCWRadar
 class PreProcessor:
     def __init__(self):
         
-        self.source_dir = r"E:\CollectedData\wxg_test\2024-05-24-17-18-12"
-        self.target_dir = r".\data\HuPR\test"
+        self.source_dir = r"/remote-home/iot_yanyifan/datasets_master/Temp/2024-05-26-22-39-35/"
+        self.target_dir = r"./data/HuPR/test"
 
         mmwave_cfg, path_bin_vert, path_bin_hori = self.load_folder(self.source_dir)        
         self.radar = FMCWRadar(mmwave_cfg)
         self.process_data(path_bin_hori, path_bin_vert)
     
     def load_folder(self, source_path_folder): 
-        with open(os.path.join(source_path_folder, "config.yaml"), 'r') as f:
+        with open(os.path.join(source_path_folder, "radar_config.yaml"), 'r') as f:
             mmwave_cfg = yaml.load(f, Loader=yaml.FullLoader)
         
         path_bin_hori = os.path.join(source_path_folder, "adc_data_hori.bin")

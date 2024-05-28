@@ -41,7 +41,6 @@ class FMCWRadar(object):
         assert filesize == self.config.file_size, \
             "Real filesize: " + str(filesize) + " Enpected filesize: " + str(self.config.file_size)
         
-        
         # # swap - must deep copy; adc_data: [I1, I2, Q1, Q2, ...] -> [I1, Q1, I2, Q2, ..., In, Qn]
         # # no need if using DCA1000 CLI 
         # adc_data_1 = deepcopy(adc_data[1: filesize: 4])
