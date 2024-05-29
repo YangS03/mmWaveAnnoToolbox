@@ -12,6 +12,7 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
+from tqdm import tqdm
 
 from modelInterface.model_interface import MInterface
 from dataInterface.data_interface import DInterface
@@ -22,12 +23,6 @@ from HuPR.misc import get_max_preds, generateTarget
 from HuPR.datasets.base import Normalize
 from HuPR.main import obj, parse_arg
 from HuPR.misc.plot import plotHumanPoseOnly
-
-
-transformFunc = transforms.Compose([
-                transforms.ToTensor(),
-                Normalize()
-            ])
 
 
 if __name__ == "__main__":
@@ -43,14 +38,13 @@ if __name__ == "__main__":
     model.to('cuda')
     model.eval()
     
-    data = DInterface(batch_size=8, dataset=HuPR3D_simple, dataset_dict={'cfg': cfg, 'args': args})
+    data = DInterface(batch_size=1, dataset=HuPR3D_simple, dataset_dict={'cfg': cfg, 'args': args})
     data.setup(stage='test')
     
     print('Start testing...')
-    for batch in data.test_dataloader(): 
+    for batch in tqdm(data.test_dataloader()): 
         VRDAEmap_hori = batch['VRDAEmap_hori'].cuda()
         VRDAEmap_vert = batch['VRDAEmap_vert'].cuda()
-        imageIdx = batch['imageId']
         heat_map, gcn_heat_map = model({'VRDAEmaps_hori': VRDAEmap_hori, 'VRDAEmaps_vert': VRDAEmap_vert})
         pred2d, _ = get_max_preds(gcn_heat_map.squeeze(1).detach().cpu().numpy())
-        plotHumanPoseOnly(pred2d * 4, visDir='./viz', imageIdx=imageIdx)
+        plotHumanPoseOnly(pred2d * 4, visDir='./viz', seqIdx=batch['seqIdx'], imageIdx=batch['imageId'])

@@ -6,5 +6,9 @@
 */CLI_LogFile.txt
 
 data/
+data
 viz/
+viz
 log/
+log
+*.mp4
