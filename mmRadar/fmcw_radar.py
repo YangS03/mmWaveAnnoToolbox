@@ -40,11 +40,11 @@ class FMCWRadar(object):
         
         # assert file_size == self.config.file_size, "Real file_size: " + str(file_size) + " Expected file_size: " + str(self.config.file_size)
         error_size = (self.config.file_size - file_size) * 2
-        assert abs(error_size) == 0, "Real file_size: " + str(file_size) + " Expected file_size: " + str(self.config.file_size)
-        # adc_data = np.pad(adc_data, (0, error_size))
+        assert abs(error_size) < 1024, "Real file_size: " + str(file_size) + " Expected file_size: " + str(self.config.file_size)
+        adc_data = np.pad(adc_data, (0, error_size))
         
-        # # swap - must deep copy; adc_data: [I1, I2, Q1, Q2, ...] -> [I1, Q1, I2, Q2, ..., In, Qn]
-        # # no need if using DCA1000 CLI 
+        # swap - must deep copy; adc_data: [I1, I2, Q1, Q2, ...] -> [I1, Q1, I2, Q2, ..., In, Qn]
+        # no need if using DCA1000 CLI (?)
         # adc_data_1 = deepcopy(adc_data[1:: 4])
         # adc_data_2 = deepcopy(adc_data[2:: 4])
         # adc_data[2:: 4] = adc_data_1
@@ -66,7 +66,7 @@ class FMCWRadar(object):
         # [num_frames, num_chirps, num_antenna, num_samples]
         adc_data_I_ = np.reshape(adc_data_I_, self.config.adc_shape)
         adc_data_Q_ = np.reshape(adc_data_Q_, self.config.adc_shape)
-        
+
         if not complex:      
             return adc_data_I_, adc_data_Q_
         else: 
@@ -191,7 +191,8 @@ class FMCWRadar(object):
             range_angle_spectrum = range_angle_spectrum.sum(axis=-1)
         return range_angle_spectrum
 
-    def get_RAED_data(self, radar_data_8rx, radar_data_4rx): 
+    def get_RAED_data(self, radar_data): 
+        radar_data_8rx, radar_data_4rx = self.parse_data(radar_data)
         # Get range data
         radar_data_8rx = self.remove_direct_component(radar_data_8rx, axis=0)
         radar_data_4rx = self.remove_direct_component(radar_data_4rx, axis=0)
@@ -207,24 +208,26 @@ class FMCWRadar(object):
         radar_data = np.stack([radar_data_8rx, radar_data_4rx], axis=2) 
         radar_data = np.pad(radar_data, ((0, 0), (0, 0), (0, self.num_elevation_bins - 2), (0, 0)))
         # Get elevation data (along specific antenna)
-        radar_data[:, 2: 6,:, :] = self.elevation_fft(radar_data[:, 2: 6,:, :], axis=-2, shift=False)
+        # radar_data[:, 2: 6,:, :] = self.elevation_fft(radar_data[:, 2: 6,:, :], axis=2, shift=False)
         # Get angle data
         radar_data = self.angle_fft(radar_data, axis=1, shift=False)
+        radar_data = self.elevation_fft(radar_data, axis=2, shift=False)
         # Shift the fft result
         radar_data = np.fft.fftshift(radar_data, axes=(1, 2, 3))    # [range, azimuth, elevation, doppler]
         # Get the specific range
-        radar_data_slc = radar_data[36: 100, :, :, :]
+        radar_data_slc = radar_data[46: 110, :, :, :]
         # Select specific velocity
         radar_data_slc = radar_data_slc[:, :, :, self.num_doppler_bins // 2 - 8: self.num_doppler_bins // 2 + 8]
         # Flip at angle axis
+        # radar_data_slc = np.flip(radar_data_slc, axis=(0, 1, 2))
         radar_data_slc = np.flip(radar_data_slc, axis=0)
         
         # plt.figure(figsize=(16, 4))
+        # plt.imshow(np.log10(np.abs(radar_data).sum(axis=(0, 3)).T).get())
         # for i in range(8): 
         #     plt.subplot(1, 8, i + 1)
-        #     plt.imshow(np.abs(radar_data[:, :, i, :]).sum(axis=-1).get())
+        #     plt.imshow(np.log10(np.abs(radar_data[:, :, i, :]).sum(axis=-1)).get())
         #     plt.title('elevation %d' % i)
         # mpld3.show()
-        # exit()
         
         return radar_data_slc.transpose(3, 0, 1, 2)

@@ -32,8 +32,14 @@ class PreProcessor:
             # '2024-05-29-23-38-57-931262',   # L
             # '2024-05-29-23-40-00-290270',   # R
             # '2024-05-29-23-41-25-579382',   # L far
-            '2024-05-29-23-42-19-849302',   # R far
+            # '2024-05-29-23-42-19-849302',   # R far
             # '2024-05-29-23-42-58-051479',   # T
+            # '2024-05-30-15-16-03-529798', 
+            # '2024-05-30-15-15-28-511850', 
+            # '2024-05-30-17-09-22-176764', 
+            # '2024-05-30-17-08-49-325422', 
+            '2024-05-30-17-58-57-870565', 
+            # '2024-05-30-17-59-43-324699', 
         ]
         self.target_dir = r"/root/proc_data/HuPR/"
         
@@ -43,7 +49,7 @@ class PreProcessor:
             mmwave_cfg, path_bin_hori, path_bin_vert, path_video = self.load_folder(source_path_folder=os.path.join(self.source_dir, seq_name), load_video=True)        
             self.radar = FMCWRadar(mmwave_cfg)
             self.process_data(path_bin_hori, path_bin_vert, target_path_folder=os.path.join(self.target_dir, seq_name), seq_name=seq_name)
-            # self.process_video(path_video, target_path_folder=os.path.join(self.target_dir, seq_name))
+            self.process_video(path_video, target_path_folder=os.path.join(self.target_dir, seq_name))
     
     def load_folder(self, source_path_folder, load_video=False): 
         print(os.path.join(source_path_folder, "radar_config.yaml"))
@@ -83,20 +89,22 @@ class PreProcessor:
             self.save_plot(cube_frame_hori, cube_frame_vert, idx_frame=idx_frame, seq_name=seq_name)
         
     def process_data_frame(self, data_frame):
-        data_8rx, data_4rx = self.radar.parse_data(data_frame)
-        data_cube = self.radar.get_RAED_data(data_8rx, data_4rx)    # [range, azimuth, elevation, doppler]
+        data_cube = self.radar.get_RAED_data(data_frame)    # [range, azimuth, elevation, doppler]
         return data_cube
     
     def save_plot(self, data_hori, data_vert, idx_frame=0, seq_name=None): 
         plt.clf()
         plt.subplot(121)
-        ramap = np.abs(data_hori).sum((0, 3))
+        # ramap = np.abs(data_hori).sum((0, 3))
+        ramap = np.abs(data_hori).sum((0, 1)).T
         plt.imshow(ramap)
-        plt.title('Range-Angle View')        
+        # plt.title('Range-Angle View')        
+        plt.title('Angle-Elevation View')        
         plt.subplot(122)
-        remap = np.abs(data_vert).sum((0, 3)).T
+        # remap = np.abs(data_vert).sum((0, 3)).T
+        remap = np.abs(data_vert).sum((0, 1))
         plt.imshow(remap)
-        plt.title('Range-Elevation View')  
+        plt.title('Angle-Elevation View')  
         if not os.path.exists('/root/viz/%s/heatmap' % seq_name): 
             os.makedirs('/root/viz/%s/heatmap' % seq_name)
         plt.savefig('/root/viz/%s/heatmap/%09d.png' % (seq_name, idx_frame))
