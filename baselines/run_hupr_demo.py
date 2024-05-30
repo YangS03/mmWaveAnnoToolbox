@@ -47,4 +47,4 @@ if __name__ == "__main__":
         VRDAEmap_vert = batch['VRDAEmap_vert'].cuda()
         heat_map, gcn_heat_map = model({'VRDAEmaps_hori': VRDAEmap_hori, 'VRDAEmaps_vert': VRDAEmap_vert})
         pred2d, _ = get_max_preds(gcn_heat_map.squeeze(1).detach().cpu().numpy())
-        plotHumanPoseOnly(pred2d * 4, visDir='./viz', seqIdx=batch['seqIdx'], imageIdx=batch['imageId'])
+        plotHumanPoseOnly(pred2d * 4, visDir='/root/viz', seqIdx=batch['seqIdx'], imageIdx=batch['imageId'])

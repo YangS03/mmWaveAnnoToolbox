@@ -1,8 +1,10 @@
 import sys
 sys.path.append('.')
+import mpld3
 import cupy as np
 from copy import deepcopy
 from easydict import EasyDict as edict
+from matplotlib import pyplot as plt
 from numpy.fft import fft, fftshift
 from mmRadar.beamformer import BartlettBeamformer, CaponBeamformer
 
@@ -38,8 +40,8 @@ class FMCWRadar(object):
         
         # assert file_size == self.config.file_size, "Real file_size: " + str(file_size) + " Expected file_size: " + str(self.config.file_size)
         error_size = (self.config.file_size - file_size) * 2
-        assert abs(error_size) < 1024, "Real file_size: " + str(file_size) + " Expected file_size: " + str(self.config.file_size)
-        adc_data = np.pad(adc_data, (0, error_size))
+        assert abs(error_size) == 0, "Real file_size: " + str(file_size) + " Expected file_size: " + str(self.config.file_size)
+        # adc_data = np.pad(adc_data, (0, error_size))
         
         # # swap - must deep copy; adc_data: [I1, I2, Q1, Q2, ...] -> [I1, Q1, I2, Q2, ..., In, Qn]
         # # no need if using DCA1000 CLI 
@@ -118,10 +120,10 @@ class FMCWRadar(object):
     def parse_data(self, IQ_complex): 
         # [num_range_bins, num_antenna, num_chirps]
         rx = self.config.num_rx
-        # radar_data_8rx = IQ_complex[:, :rx * 2, :]
-        # radar_data_4rx = IQ_complex[:, rx * 2:, :]
-        radar_data_8rx = np.concatenate([IQ_complex[:, :rx, :], IQ_complex[:, rx * 2:, :]], axis=1)
-        radar_data_4rx = IQ_complex[:, rx: rx * 2, :]
+        radar_data_8rx = IQ_complex[:, :rx * 2, :]
+        radar_data_4rx = IQ_complex[:, rx * 2:, :]
+        # radar_data_8rx = np.concatenate([IQ_complex[:, :rx, :], IQ_complex[:, rx * 2:, :]], axis=1)
+        # radar_data_4rx = IQ_complex[:, rx: rx * 2, :]
         return radar_data_8rx, radar_data_4rx
         
     def get_window_sample(self, slow_time_samples, window_size, window_step=1, sample_mothod="sliding"):
@@ -207,15 +209,22 @@ class FMCWRadar(object):
         # Get elevation data (along specific antenna)
         radar_data[:, 2: 6,:, :] = self.elevation_fft(radar_data[:, 2: 6,:, :], axis=-2, shift=False)
         # Get angle data
-        radar_data = self.angle_fft(radar_data, shift=False)
+        radar_data = self.angle_fft(radar_data, axis=1, shift=False)
         # Shift the fft result
-        radar_data = np.fft.fftshift(radar_data, axes=(1, 2, 3))
+        radar_data = np.fft.fftshift(radar_data, axes=(1, 2, 3))    # [range, azimuth, elevation, doppler]
         # Get the specific range
-        # radar_data = radar_data[0: 64, :, :, :]
-        radar_data = radar_data[100: 36: -1, :, :, :]
+        radar_data_slc = radar_data[36: 100, :, :, :]
         # Select specific velocity
-        radar_data = radar_data[:, :, :, self.num_doppler_bins // 2 - 8: self.num_doppler_bins // 2 + 8]
+        radar_data_slc = radar_data_slc[:, :, :, self.num_doppler_bins // 2 - 8: self.num_doppler_bins // 2 + 8]
         # Flip at angle axis
-        # radar_data = np.flip(radar_data, axis=0)
+        radar_data_slc = np.flip(radar_data_slc, axis=0)
         
-        return radar_data
+        # plt.figure(figsize=(16, 4))
+        # for i in range(8): 
+        #     plt.subplot(1, 8, i + 1)
+        #     plt.imshow(np.abs(radar_data[:, :, i, :]).sum(axis=-1).get())
+        #     plt.title('elevation %d' % i)
+        # mpld3.show()
+        # exit()
+        
+        return radar_data_slc.transpose(3, 0, 1, 2)
